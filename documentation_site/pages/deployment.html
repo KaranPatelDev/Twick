@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deployment Guide - Twick Documentation</title>
+    <meta name="description" content="Complete deployment guide for Twick social media platform">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="../assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">
+                Twick Docs
+            </a>
+            
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="architecture.html">Architecture</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="api-reference.html">API Reference</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="deployment.html">Deployment</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Content -->
+    <section class="section" style="padding-top: 120px;">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="sidebar">
+                        <h4>Deployment</h4>
+                        <ul class="sidebar-nav">
+                            <li><a href="#overview" class="active">Overview</a></li>
+                            <li><a href="#docker">Docker Deployment</a></li>
+                            <li><a href="#cloud">Cloud Platforms</a></li>
+                            <li><a href="#vps">VPS Deployment</a></li>
+                            <li><a href="#ssl">SSL Certificate</a></li>
+                            <li><a href="#monitoring">Monitoring</a></li>
+                            <li><a href="#backup">Backup Strategy</a></li>
+                            <li><a href="#scaling">Scaling</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="col-lg-9">
+                    <h1>Deployment Guide</h1>
+                    <p class="lead">Complete guide to deploy Twick to production environments with best practices and security considerations.</p>
+                    
+                    <!-- Overview -->
+                    <section id="overview" class="mb-5">
+                        <h2>Deployment Overview</h2>
+                        <p>Twick can be deployed in various environments from simple VPS to enterprise cloud infrastructure.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <div class="card-icon">
+                                            <i class="bi bi-box"></i>
+                                        </div>
+                                        <h4 class="card-title">Docker Deployment</h4>
+                                    </div>
+                                    <div class="card-description">
+                                        Containerized deployment with Docker Compose for easy setup and scalability.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <div class="card-icon">
+                                            <i class="bi bi-cloud"></i>
+                                        </div>
+                                        <h4 class="card-title">Cloud Platforms</h4>
+                                    </div>
+                                    <div class="card-description">
+                                        Deploy to AWS, Google Cloud, Azure, or Digital Ocean with managed services.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <div class="card-icon">
+                                            <i class="bi bi-server"></i>
+                                        </div>
+                                        <h4 class="card-title">VPS/Dedicated</h4>
+                                    </div>
+                                    <div class="card-description">
+                                        Traditional server deployment with full control and customization options.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <!-- Docker Deployment -->
+                    <section id="docker" class="mb-5">
+                        <h2>Docker Deployment</h2>
+                        <p>The recommended way to deploy Twick using Docker containers.</p>
+                        
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i>
+                            <strong>Prerequisites:</strong> Docker 20.10+, Docker Compose 2.0+, 2GB RAM minimum
+                        </div>
+                        
+                        <h3>Production Docker Compose</h3>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-lang">yaml</span>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            <div class="code-content">
+# docker-compose.prod.yml
+version: '3.8'
+
+services:
+  web:
+    build: 
+      context: .
+      dockerfile: Dockerfile.prod
+    ports:
+      - "80:8000"
+      - "443:8443"
+    environment:
+      - DEBUG=False
+      - SECRET_KEY=${SECRET_KEY}
+      - DATABASE_URL=postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+      - REDIS_URL=redis://redis:6379
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ./media:/app/media
+      - ./staticfiles:/app/staticfiles
+      - ./ssl:/app/ssl
+    restart: unless-stopped
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backups:/backups
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/ssl/certs
+      - ./staticfiles:/var/www/static
+      - ./media:/var/www/media
+    depends_on:
+      - web
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+                            </div>
+                        </div>
+                        
+                        <h3>Environment Configuration</h3>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-lang">bash</span>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            <div class="code-content">
+# .env.prod
+SECRET_KEY=your-super-secret-key-here
+DEBUG=False
+DB_NAME=twick_prod
+DB_USER=twick_user
+DB_PASSWORD=secure_database_password
+ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com
+EMAIL_HOST=smtp.yourdomain.com
+EMAIL_HOST_USER=noreply@yourdomain.com
+EMAIL_HOST_PASSWORD=email_password
+                            </div>
+                        </div>
+                        
+                        <h3>Deployment Commands</h3>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-lang">bash</span>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            <div class="code-content">
+# Clone and configure
+git clone https://github.com/yourusername/twick.git
+cd twick
+cp .env.example .env.prod
+# Edit .env.prod with your settings
+
+# Build and deploy
+docker-compose -f docker-compose.prod.yml up --build -d
+
+# Run migrations
+docker-compose -f docker-compose.prod.yml exec web python manage.py migrate
+
+# Create superuser
+docker-compose -f docker-compose.prod.yml exec web python manage.py createsuperuser
+
+# Collect static files
+docker-compose -f docker-compose.prod.yml exec web python manage.py collectstatic --noinput
+
+# Check status
+docker-compose -f docker-compose.prod.yml ps
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <!-- Cloud Deployment -->
+                    <section id="cloud" class="mb-5">
+                        <h2>Cloud Platform Deployment</h2>
+                        <p>Deploy Twick to major cloud platforms with managed services.</p>
+                        
+                        <!-- AWS -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h4 class="card-title">
+                                    <i class="bi bi-cloud"></i> Amazon Web Services (AWS)
+                                </h4>
+                            </div>
+                            <div class="card-body">
+                                <h5>Recommended AWS Architecture</h5>
+                                <ul>
+                                    <li><strong>EC2:</strong> t3.medium instances with Auto Scaling</li>
+                                    <li><strong>RDS:</strong> PostgreSQL with Multi-AZ deployment</li>
+                                    <li><strong>ElastiCache:</strong> Redis for caching and sessions</li>
+                                    <li><strong>S3:</strong> Static files and media storage</li>
+                                    <li><strong>CloudFront:</strong> CDN for global content delivery</li>
+                                    <li><strong>ALB:</strong> Application Load Balancer with SSL termination</li>
+                                </ul>
+                                
+                                <div class="code-block mt-3">
+                                    <div class="code-header">
+                                        <span class="code-lang">bash</span>
+                                        <button class="copy-btn">Copy</button>
+                                    </div>
+                                    <div class="code-content">
+# AWS deployment with Terraform
+terraform init
+terraform plan -var-file="aws.tfvars"
+terraform apply
+
+# Or use AWS ECS with Fargate
+aws ecs create-cluster --cluster-name twick-cluster
+aws ecs create-service --cluster twick-cluster --service-name twick-service
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Digital Ocean -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h4 class="card-title">
+                                    <i class="bi bi-water"></i> Digital Ocean
+                                </h4>
+                            </div>
+                            <div class="card-body">
+                                <h5>Digital Ocean App Platform</h5>
+                                <p>One-click deployment with managed services.</p>
+                                
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-lang">yaml</span>
+                                        <button class="copy-btn">Copy</button>
+                                    </div>
+                                    <div class="code-content">
+# .do/app.yaml
+name: twick
+services:
+- name: web
+  source_dir: /
+  github:
+    repo: yourusername/twick
+    branch: main
+  run_command: gunicorn twick.wsgi:application
+  environment_slug: python
+  instance_count: 2
+  instance_size_slug: basic-xxs
+  envs:
+  - key: DEBUG
+    value: "False"
+  - key: DATABASE_URL
+    type: SECRET
+  routes:
+  - path: /
+databases:
+- name: twick-db
+  engine: PG
+  version: "13"
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <!-- VPS Deployment -->
+                    <section id="vps" class="mb-5">
+                        <h2>VPS Deployment</h2>
+                        <p>Deploy to a Virtual Private Server with full control.</p>
+                        
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <strong>Server Requirements:</strong> Ubuntu 20.04+, 2GB RAM, 20GB disk space, root access
+                        </div>
+                        
+                        <h3>Server Setup Script</h3>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-lang">bash</span>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            <div class="code-content">
+#!/bin/bash
+# setup_server.sh - Complete VPS setup script
+
+# Update system
+apt update && apt upgrade -y
+
+# Install dependencies
+apt install -y python3 python3-pip python3-venv postgresql postgresql-contrib 
+apt install -y nginx certbot python3-certbot-nginx redis-server
+
+# Create application user
+adduser --system --group twick
+mkdir -p /opt/twick
+chown twick:twick /opt/twick
+
+# Setup PostgreSQL
+sudo -u postgres createdb twick
+sudo -u postgres createuser --interactive twick
+
+# Setup virtual environment
+cd /opt/twick
+python3 -m venv twick_env
+source twick_env/bin/activate
+
+# Clone and install application
+git clone https://github.com/yourusername/twick.git .
+pip install -r requirements.txt
+
+# Configure environment
+cp .env.example .env
+# Edit .env with production settings
+
+# Run migrations
+python manage.py migrate
+python manage.py collectstatic --noinput
+
+# Setup systemd service
+cp scripts/twick.service /etc/systemd/system/
+systemctl enable twick
+systemctl start twick
+
+# Configure Nginx
+cp scripts/nginx.conf /etc/nginx/sites-available/twick
+ln -s /etc/nginx/sites-available/twick /etc/nginx/sites-enabled/
+rm /etc/nginx/sites-enabled/default
+systemctl restart nginx
+
+echo "Twick deployed successfully!"
+echo "Configure SSL with: certbot --nginx -d yourdomain.com"
+                            </div>
+                        </div>
+                        
+                        <h3>Nginx Configuration</h3>
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-lang">nginx</span>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            <div class="code-content">
+# /etc/nginx/sites-available/twick
+server {
+    listen 80;
+    server_name yourdomain.com www.yourdomain.com;
+    
+    client_max_body_size 10M;
+    
+    location /static/ {
+        alias /opt/twick/staticfiles/;
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+    }
+    
+    location /media/ {
+        alias /opt/twick/media/;
+        expires 7d;
+        add_header Cache-Control "public";
+    }
+    
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <!-- SSL Certificate -->
+                    <section id="ssl" class="mb-5">
+                        <h2>SSL Certificate Setup</h2>
+                        <p>Secure your Twick deployment with HTTPS using Let's Encrypt.</p>
+                        
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-lang">bash</span>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            <div class="code-content">
+# Install Certbot
+apt install certbot python3-certbot-nginx
+
+# Obtain certificate
+certbot --nginx -d yourdomain.com -d www.yourdomain.com
+
+# Auto-renewal setup
+crontab -e
+# Add: 0 12 * * * /usr/bin/certbot renew --quiet
+
+# Test auto-renewal
+certbot renew --dry-run
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <!-- Monitoring -->
+                    <section id="monitoring" class="mb-5">
+                        <h2>Monitoring and Logging</h2>
+                        <p>Set up monitoring and logging for production deployment.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h4 class="card-title">Application Monitoring</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul>
+                                            <li>Django logging configuration</li>
+                                            <li>Error tracking with Sentry</li>
+                                            <li>Performance monitoring</li>
+                                            <li>Health check endpoints</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h4 class="card-title">System Monitoring</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul>
+                                            <li>Server resource monitoring</li>
+                                            <li>Database performance</li>
+                                            <li>Nginx access logs</li>
+                                            <li>Uptime monitoring</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="code-block mt-4">
+                            <div class="code-header">
+                                <span class="code-lang">python</span>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            <div class="code-content">
+# Production logging configuration
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/twick/django.log',
+            'formatter': 'verbose',
+        },
+        'sentry': {
+            'level': 'ERROR',
+            'class': 'sentry_sdk.integrations.logging.SentryHandler',
+        },
+    },
+    'root': {
+        'handlers': ['file', 'sentry'],
+        'level': 'INFO',
+    },
+}
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <!-- Backup Strategy -->
+                    <section id="backup" class="mb-5">
+                        <h2>Backup Strategy</h2>
+                        <p>Comprehensive backup strategy for data protection.</p>
+                        
+                        <div class="card">
+                            <div class="card-body">
+                                <h4>Backup Components</h4>
+                                <ul>
+                                    <li><strong>Database:</strong> Automated PostgreSQL dumps</li>
+                                    <li><strong>Media Files:</strong> User uploads and images</li>
+                                    <li><strong>Application Code:</strong> Git repository backup</li>
+                                    <li><strong>Configuration:</strong> Environment variables and settings</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="code-block mt-4">
+                            <div class="code-header">
+                                <span class="code-lang">bash</span>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            <div class="code-content">
+#!/bin/bash
+# backup.sh - Automated backup script
+
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_DIR="/backups"
+
+# Database backup
+pg_dump twick > $BACKUP_DIR/db_backup_$DATE.sql
+
+# Media files backup
+tar -czf $BACKUP_DIR/media_backup_$DATE.tar.gz /opt/twick/media/
+
+# Upload to cloud storage (AWS S3 example)
+aws s3 cp $BACKUP_DIR/db_backup_$DATE.sql s3://twick-backups/
+aws s3 cp $BACKUP_DIR/media_backup_$DATE.tar.gz s3://twick-backups/
+
+# Clean old local backups (keep 7 days)
+find $BACKUP_DIR -name "*.sql" -mtime +7 -delete
+find $BACKUP_DIR -name "*.tar.gz" -mtime +7 -delete
+
+echo "Backup completed: $DATE"
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <!-- Scaling -->
+                    <section id="scaling" class="mb-5">
+                        <h2>Scaling Considerations</h2>
+                        <p>Strategies for scaling Twick as your user base grows.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h4 class="card-title">Horizontal Scaling</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul>
+                                            <li>Load balancer setup</li>
+                                            <li>Multiple app instances</li>
+                                            <li>Database read replicas</li>
+                                            <li>CDN for static files</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h4 class="card-title">Performance Optimization</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul>
+                                            <li>Redis caching layer</li>
+                                            <li>Database query optimization</li>
+                                            <li>Image compression</li>
+                                            <li>Async task processing</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h4 class="card-title">Infrastructure as Code</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul>
+                                            <li>Terraform templates</li>
+                                            <li>Kubernetes deployment</li>
+                                            <li>CI/CD pipelines</li>
+                                            <li>Auto-scaling policies</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="text-center">
+                <p>&copy; 2024 Twick Documentation. Built with ❤️ for the Django community.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/main.js"></script>
+</body>
+</html>

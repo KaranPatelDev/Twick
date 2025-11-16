@@ -1,0 +1,159 @@
+{% extends "layout.html" %}
+
+{% block title %}Sign Up - Twick{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="tweet-card p-4">
+            <div class="text-center mb-4">
+                <svg width="56" height="56" viewBox="0 0 100 100" class="mb-3 twick-logo-glow" style="fill: var(--primary-color, #1DA1F2);">
+                    <!-- Background circle with gradient -->
+                    <defs>
+                        <radialGradient id="registerGlow" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" style="stop-color:rgba(29, 161, 242, 0.1);stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:rgba(29, 161, 242, 0);stop-opacity:0" />
+                        </radialGradient>
+                    </defs>
+                    <circle cx="50" cy="50" r="45" fill="url(#registerGlow)"/>
+                    
+                    <!-- Megaphone/Speaker representing freedom of speech -->
+                    <path d="M15 25 L40 25 L60 10 L85 10 L85 90 L60 90 L40 75 L15 75 Z" stroke="currentColor" stroke-width="2" fill="currentColor"/>
+                    
+                    <!-- Enhanced sound waves with colors -->
+                    <path class="sound-wave" d="M70 20 Q85 30 85 50 Q85 70 70 80" stroke="#FFD700" stroke-width="3" fill="none" opacity="0.8"/>
+                    <path class="sound-wave" d="M75 25 Q87 35 87 50 Q87 65 75 75" stroke="#FF6B6B" stroke-width="2" fill="none" opacity="0.7"/>
+                    
+                    <!-- Voice opening -->
+                    <circle cx="27" cy="50" r="10" fill="white" stroke="currentColor" stroke-width="1"/>
+                    
+                    <!-- Plus sign for registration with sparkle -->
+                    <g transform="translate(70,20)">
+                        <circle cx="0" cy="0" r="10" fill="#4ECDC4" stroke="white" stroke-width="2" opacity="0.9"/>
+                        <path d="M-5 0 L5 0 M0 -5 L0 5" stroke="white" stroke-width="2.5"/>
+                        <!-- Sparkle effect -->
+                        <path d="M12 -8 L14 -6 L16 -8 L14 -10 Z" fill="gold" opacity="0.8">
+                            <animate attributeName="opacity" values="0.8;0.3;0.8" dur="2s" repeatCount="indefinite"/>
+                        </path>
+                    </g>
+                </svg>
+                <h2 class="h3" style="background: linear-gradient(45deg, #1DA1F2, #4ECDC4, #FFD700); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Join Twick Today</h2>
+                <p class="text-muted">Create your account and start sharing</p>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name</label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.first_name.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name</label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.last_name.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="{{ form.username.id_for_label }}" class="form-label">Username *</label>
+                    <div class="input-group">
+                        <span class="input-group-text">@</span>
+                        {{ form.username }}
+                    </div>
+                    {% if form.username.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.username.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                    <div class="form-text">This will be your unique identifier on Twick.</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="{{ form.email.id_for_label }}" class="form-label">Email Address *</label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.email.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label for="{{ form.password1.id_for_label }}" class="form-label">Password *</label>
+                    {{ form.password1 }}
+                    {% if form.password1.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.password1.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                    <div class="form-text">
+                        <ul class="mb-0 small">
+                            <li>At least 8 characters long</li>
+                            <li>Can't be too similar to your other personal information</li>
+                            <li>Can't be a commonly used password</li>
+                            <li>Can't be entirely numeric</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="{{ form.password2.id_for_label }}" class="form-label">Confirm Password *</label>
+                    {{ form.password2 }}
+                    {% if form.password2.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.password2.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="d-grid mb-3">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-person-plus me-2"></i>Create Account
+                    </button>
+                </div>
+            </form>
+
+            <div class="text-center">
+                <p class="text-muted mb-0">Already have an account?</p>
+                <a href="{% url 'login' %}" class="text-decoration-none">
+                    Sign in here <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .input-group-text {
+        background-color: #f8f9fa;
+        border-right: none;
+    }
+    
+    .form-control {
+        border-left: none;
+    }
+    
+    .form-control:focus {
+        border-left: none;
+        box-shadow: none;
+    }
+</style>
+{% endblock %}

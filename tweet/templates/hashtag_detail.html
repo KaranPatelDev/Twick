@@ -1,0 +1,263 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block title %}#{{ hashtag.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <!-- Hashtag Header -->
+            <div class="mb-4">
+                <h1 class="display-6">#{{ hashtag.name }}</h1>
+                <p class="text-muted">{{ hashtag.tweet_count }} tweet{{ hashtag.tweet_count|pluralize }} • Created {{ hashtag.created_at|date:"M d, Y" }}</p>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="mb-4">
+                <div class="btn-group" role="group">
+                    <a href="{% url 'tweet_create' %}?hashtag={{ hashtag.name }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Tweet #{{ hashtag.name }}
+                    </a>
+                    <button class="btn btn-outline-secondary" onclick="followHashtag('{{ hashtag.name }}')">
+                        <i class="fas fa-bookmark"></i> Follow
+                    </button>
+                    <button class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="fas fa-share"></i> Share
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#" onclick="copyToClipboard(window.location.href)">Copy link</a></li>
+                        <li><a class="dropdown-item" href="https://twitter.com/intent/tweet?text=Check out %23{{ hashtag.name }} on Twick! {{ request.build_absolute_uri }}" target="_blank">Share on Twitter</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Related Hashtags -->
+            <div class="mb-4">
+                <h6>Related Hashtags</h6>
+                <div class="d-flex flex-wrap gap-2">
+                    <!-- This would require additional logic to find related hashtags -->
+                    {% comment %}
+                    {% for related in related_hashtags %}
+                        <a href="{% url 'hashtag_detail' related.name %}" class="badge bg-secondary text-decoration-none">#{{ related.name }}</a>
+                    {% endfor %}
+                    {% endcomment %}
+                    <span class="text-muted">Feature coming soon</span>
+                </div>
+            </div>
+            
+            <!-- Filter Options -->
+            <div class="mb-4">
+                <div class="btn-group btn-group-sm" role="group">
+                    <input type="radio" class="btn-check" name="filter" id="recent" checked>
+                    <label class="btn btn-outline-secondary" for="recent">Recent</label>
+                    
+                    <input type="radio" class="btn-check" name="filter" id="popular">
+                    <label class="btn btn-outline-secondary" for="popular">Popular</label>
+                    
+                    <input type="radio" class="btn-check" name="filter" id="media">
+                    <label class="btn btn-outline-secondary" for="media">Photos & Videos</label>
+                </div>
+            </div>
+            
+            <!-- Tweets with this hashtag -->
+            <div id="tweetsContainer">
+                {% for tweet in tweets %}
+                    <div class="card mb-3 tweet-card" data-has-media="{% if tweet.image %}true{% else %}false{% endif %}">
+                        <div class="card-body">
+                            <div class="d-flex align-items-start">
+                                <!-- User Avatar -->
+                                <div class="me-3">
+                                    {% if tweet.user.userprofile.avatar %}
+                                        <img src="{{ tweet.user.userprofile.avatar.url }}" alt="{{ tweet.user.username }}" class="rounded-circle" width="40" height="40">
+                                    {% else %}
+                                        <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                            <i class="fas fa-user text-white"></i>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Tweet Content -->
+                                <div class="flex-grow-1">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <strong><a href="{% url 'user_profile' tweet.user.username %}" class="text-decoration-none">{{ tweet.user.get_full_name|default:tweet.user.username }}</a></strong>
+                                        <span class="text-muted ms-2">@{{ tweet.user.username }}</span>
+                                        <span class="text-muted ms-2">•</span>
+                                        <span class="text-muted ms-2">{{ tweet.created_at|timesince }} ago</span>
+                                        {% if tweet.privacy == 'private' %}
+                                            <i class="fas fa-lock text-muted ms-2" title="Private tweet"></i>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <!-- Tweet Text with Highlighted Hashtag -->
+                                    <div class="mb-2">
+                                        {% load custom_filters %}
+                                        {{ tweet.text|highlight_hashtags|highlight_mentions|safe }}
+                                    </div>
+                                    
+                                    <!-- Tweet Image -->
+                                    {% if tweet.image %}
+                                        <div class="mb-3">
+                                            <img src="{{ tweet.image.url }}" alt="Tweet image" class="img-fluid rounded" style="max-height: 400px; width: auto;">
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <!-- Tweet Actions -->
+                                    <div class="d-flex justify-content-between text-muted">
+                                        <button class="btn btn-link btn-sm text-muted p-0" onclick="replyToTweet({{ tweet.id }})">
+                                            <i class="fas fa-reply"></i> {{ tweet.get_replies_count }}
+                                        </button>
+                                        
+                                        <button class="btn btn-link btn-sm text-muted p-0" onclick="likeTweet({{ tweet.id }})">
+                                            <i class="fas fa-heart {% if request.user in tweet.likes.all %}text-danger{% endif %}" id="like-icon-{{ tweet.id }}"></i>
+                                            <span id="like-count-{{ tweet.id }}">{{ tweet.get_likes_count }}</span>
+                                        </button>
+                                        
+                                        <button class="btn btn-link btn-sm text-muted p-0" onclick="shareTweet({{ tweet.id }})">
+                                            <i class="fas fa-share"></i>
+                                        </button>
+                                        
+                                        <a href="{% url 'tweet_detail' tweet.id %}" class="btn btn-link btn-sm text-muted p-0">
+                                            <i class="fas fa-external-link-alt"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-hashtag fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No tweets found</h5>
+                        <p class="text-muted">Be the first to tweet with #{{ hashtag.name }}!</p>
+                        <a href="{% url 'tweet_create' %}?hashtag={{ hashtag.name }}" class="btn btn-primary">Create Tweet</a>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Load More Button -->
+            {% if tweets|length >= 20 %}
+                <div class="text-center mt-4">
+                    <button class="btn btn-outline-primary" onclick="loadMoreTweets()">
+                        <i class="fas fa-chevron-down"></i> Load More
+                    </button>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">Hashtag Stats</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col">
+                            <div class="h4 mb-0">{{ hashtag.tweet_count }}</div>
+                            <small class="text-muted">Tweets</small>
+                        </div>
+                        <div class="col">
+                            <div class="h4 mb-0">{{ tweets|length }}</div>
+                            <small class="text-muted">Today</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">Trending Hashtags</h6>
+                </div>
+                <div class="card-body">
+                    {% for trending in trending_hashtags %}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <a href="{% url 'hashtag_detail' trending.hashtag.name %}" class="text-decoration-none">#{{ trending.hashtag.name }}</a>
+                            <small class="text-muted">{{ trending.tweets_last_24h }}</small>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Filter functionality
+document.querySelectorAll('input[name="filter"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        filterTweets(this.id);
+    });
+});
+
+function filterTweets(filter) {
+    const tweets = document.querySelectorAll('.tweet-card');
+    
+    tweets.forEach(tweet => {
+        const hasMedia = tweet.dataset.hasMedia === 'true';
+        
+        switch(filter) {
+            case 'recent':
+                tweet.style.display = 'block';
+                break;
+            case 'popular':
+                // Would need to implement popularity scoring
+                tweet.style.display = 'block';
+                break;
+            case 'media':
+                tweet.style.display = hasMedia ? 'block' : 'none';
+                break;
+        }
+    });
+}
+
+function likeTweet(tweetId) {
+    fetch(`/tweet/${tweetId}/like/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        const icon = document.getElementById(`like-icon-${tweetId}`);
+        const count = document.getElementById(`like-count-${tweetId}`);
+        
+        if (data.liked) {
+            icon.classList.add('text-danger');
+        } else {
+            icon.classList.remove('text-danger');
+        }
+        
+        count.textContent = data.likes_count;
+    });
+}
+
+function replyToTweet(tweetId) {
+    window.location.href = `/tweet/${tweetId}/reply/`;
+}
+
+function shareTweet(tweetId) {
+    const url = `${window.location.origin}/tweet/${tweetId}/`;
+    copyToClipboard(url);
+    alert('Tweet link copied to clipboard!');
+}
+
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Link copied to clipboard!');
+    });
+}
+
+function followHashtag(hashtagName) {
+    // This would require additional implementation
+    alert(`Following #${hashtagName} feature coming soon!`);
+}
+
+function loadMoreTweets() {
+    // This would require pagination implementation
+    alert('Load more feature coming soon!');
+}
+</script>
+{% endblock %}

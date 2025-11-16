@@ -1,0 +1,40 @@
+<!-- Twick Logo Component - Freedom of Speech Megaphone -->
+<!-- Usage: {% include 'components/twick_logo.html' with size='md' animated=True %} -->
+
+{% load static %}
+
+<svg 
+    width="{% if size == 'sm' %}24{% elif size == 'lg' %}48{% elif size == 'xl' %}64{% else %}32{% endif %}" 
+    height="{% if size == 'sm' %}24{% elif size == 'lg' %}48{% elif size == 'xl' %}64{% else %}32{% endif %}" 
+    viewBox="0 0 100 100" 
+    class="twick-logo{% if size %} twick-logo-{{ size }}{% endif %}{% if animated %} twick-logo-animated{% endif %}" 
+    style="fill: var(--primary-color, #1DA1F2);"
+>
+    <!-- Megaphone/Speaker body representing freedom of speech -->
+    <path d="M20 30 L45 30 L65 15 L85 15 L85 85 L65 85 L45 70 L20 70 Z" 
+          stroke="currentColor" stroke-width="3" fill="currentColor"/>
+    
+    <!-- Sound waves representing voice projection -->
+    <path class="{% if animated %}sound-wave{% endif %}" 
+          d="M75 25 Q85 35 85 50 Q85 65 75 75" 
+          stroke="currentColor" stroke-width="2" fill="none"/>
+    <path class="{% if animated %}sound-wave{% endif %}" 
+          d="M80 30 Q87 38 87 50 Q87 62 80 70" 
+          stroke="currentColor" stroke-width="2" fill="none"/>
+    <path class="{% if animated %}sound-wave{% endif %}" 
+          d="M85 35 Q90 42 90 50 Q90 58 85 65" 
+          stroke="currentColor" stroke-width="1.5" fill="none"/>
+    
+    <!-- Voice opening - where speech comes from -->
+    <circle cx="30" cy="50" r="8" fill="white"/>
+    
+    <!-- Speech particles representing active communication -->
+    <circle cx="50" cy="42" r="1.5" fill="currentColor" opacity="0.8"/>
+    <circle cx="55" cy="50" r="1" fill="currentColor" opacity="0.6"/>
+    <circle cx="60" cy="58" r="1.2" fill="currentColor" opacity="0.7"/>
+    
+    <!-- Freedom flag element (optional, shown only on larger sizes) -->
+    {% if size == 'lg' or size == 'xl' %}
+    <path d="M40 25 L50 20 L50 35 Z" fill="white" opacity="0.9"/>
+    {% endif %}
+</svg>

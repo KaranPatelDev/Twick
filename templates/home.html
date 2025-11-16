@@ -1,0 +1,284 @@
+{% extends "layout.html" %}
+
+{% block title %}Home - Twick{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Main Content -->
+    <div class="col-lg-8">
+        <!-- Welcome Section -->
+        <div class="tweet-card p-4 mb-4">
+            <div class="text-center">
+                <h1 class="display-4 fw-bold text-primary mb-3">
+                    <svg width="72" height="72" viewBox="0 0 100 100" class="me-3 twick-logo-xl" style="fill: var(--primary-color);">
+                        <!-- Glowing background effect -->
+                        <defs>
+                            <radialGradient id="glowEffect" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%" style="stop-color:rgba(29, 161, 242, 0.2);stop-opacity:1" />
+                                <stop offset="70%" style="stop-color:rgba(29, 161, 242, 0.1);stop-opacity:0.5" />
+                                <stop offset="100%" style="stop-color:rgba(29, 161, 242, 0);stop-opacity:0" />
+                            </radialGradient>
+                            <linearGradient id="megaphoneGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#1DA1F2" />
+                                <stop offset="50%" style="stop-color:#1991DB" />
+                                <stop offset="100%" style="stop-color:#1580C4" />
+                            </linearGradient>
+                            <filter id="dropShadow" x="-50%" y="-50%" width="200%" height="200%">
+                                <feDropShadow dx="2" dy="2" stdDeviation="3" flood-color="rgba(29, 161, 242, 0.3)"/>
+                            </filter>
+                        </defs>
+                        
+                        <!-- Glow background -->
+                        <circle cx="50" cy="50" r="45" fill="url(#glowEffect)"/>
+                        
+                        <!-- Megaphone/Speaker with gradient -->
+                        <path d="M15 25 L40 25 L60 10 L85 10 L85 90 L60 90 L40 75 L15 75 Z" 
+                              fill="url(#megaphoneGradient)" stroke="currentColor" stroke-width="1.5" filter="url(#dropShadow)"/>
+                        
+                        <!-- Enhanced sound waves with different colors -->
+                        <path class="sound-wave" d="M70 20 Q85 30 85 50 Q85 70 70 80" 
+                              stroke="#FFD700" stroke-width="3" fill="none" opacity="0.8">
+                            <animate attributeName="stroke-width" values="3;4;3" dur="2s" repeatCount="indefinite"/>
+                        </path>
+                        <path class="sound-wave" d="M75 25 Q87 35 87 50 Q87 65 75 75" 
+                              stroke="#FF6B6B" stroke-width="2.5" fill="none" opacity="0.7">
+                            <animate attributeName="stroke-width" values="2.5;3.5;2.5" dur="2.2s" repeatCount="indefinite"/>
+                        </path>
+                        <path class="sound-wave" d="M80 30 Q90 38 90 50 Q90 62 80 70" 
+                              stroke="#4ECDC4" stroke-width="2" fill="none" opacity="0.6">
+                            <animate attributeName="stroke-width" values="2;3;2" dur="1.8s" repeatCount="indefinite"/>
+                        </path>
+                        
+                        <!-- Enhanced voice opening -->
+                        <circle cx="27" cy="50" r="10" fill="white" stroke="currentColor" stroke-width="2"/>
+                        <circle cx="27" cy="50" r="6" fill="url(#megaphoneGradient)" opacity="0.4"/>
+                        
+                        <!-- Animated message bubbles -->
+                        <circle cx="45" cy="35" r="3" fill="#FFD700" opacity="0.9">
+                            <animate attributeName="r" values="3;4;3" dur="1.5s" repeatCount="indefinite"/>
+                            <animate attributeName="opacity" values="0.9;0.4;0.9" dur="1.5s" repeatCount="indefinite"/>
+                        </circle>
+                        <circle cx="50" cy="45" r="2.5" fill="#FF6B6B" opacity="0.8">
+                            <animate attributeName="r" values="2.5;3.5;2.5" dur="1.8s" repeatCount="indefinite"/>
+                            <animate attributeName="opacity" values="0.8;0.3;0.8" dur="1.8s" repeatCount="indefinite"/>
+                        </circle>
+                        <circle cx="55" cy="55" r="3.2" fill="#4ECDC4" opacity="0.7">
+                            <animate attributeName="r" values="3.2;4.2;3.2" dur="2.1s" repeatCount="indefinite"/>
+                            <animate attributeName="opacity" values="0.7;0.2;0.7" dur="2.1s" repeatCount="indefinite"/>
+                        </circle>
+                        
+                        <!-- Freedom elements -->
+                        <path d="M40 22 L52 17 L52 35 Z" fill="gold" opacity="0.9">
+                            <animate attributeName="opacity" values="0.9;0.5;0.9" dur="3s" repeatCount="indefinite"/>
+                        </path>
+                        
+                        <!-- Liberty stars -->
+                        <g opacity="0.8">
+                            <path d="M20 15 L21 18 L24 18 L22 20 L23 23 L20 21 L17 23 L18 20 L16 18 L19 18 Z" fill="gold">
+                                <animate attributeName="opacity" values="0.8;0.3;0.8" dur="2.5s" repeatCount="indefinite"/>
+                            </path>
+                            <path d="M75 12 L76 15 L79 15 L77 17 L78 20 L75 18 L72 20 L73 17 L71 15 L74 15 Z" fill="gold">
+                                <animate attributeName="opacity" values="0.8;0.3;0.8" dur="3s" repeatCount="indefinite"/>
+                            </path>
+                        </g>
+                    </svg>
+                    <span style="background: linear-gradient(45deg, #1DA1F2, #FFD700, #FF6B6B); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 900;">Welcome to Twick</span>
+                </h1>
+                <p class="lead text-muted mb-4">
+                    Connect with friends and the world around you on Twick. Share your thoughts, photos, and more.
+                </p>
+                
+                {% if not user.is_authenticated %}
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{% url 'register' %}" class="btn btn-primary btn-lg">
+                            <i class="bi bi-person-plus me-2"></i>Sign Up
+                        </a>
+                        <a href="{% url 'login' %}" class="btn btn-outline-primary btn-lg">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Login
+                        </a>
+                    </div>
+                {% else %}
+                    <a href="{% url 'tweet_create' %}" class="btn btn-primary btn-lg">
+                        <i class="bi bi-plus-circle me-2"></i>Share Your Thoughts
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Recent Tweets -->
+        {% if tweets %}
+        <div class="tweet-card p-4">
+            <h3 class="h4 mb-4">
+                <i class="bi bi-fire me-2"></i>Recent Tweets
+            </h3>
+            
+            {% for tweet in tweets %}
+            <div class="d-flex mb-4 pb-4 {% if not forloop.last %}border-bottom{% endif %}">
+                <!-- User Avatar -->
+                <div class="me-3">
+                    {% if tweet.user.userprofile and tweet.user.userprofile.avatar %}
+                        <img src="{{ tweet.user.userprofile.avatar.url }}" alt="{{ tweet.user.username }}" 
+                             class="profile-avatar">
+                    {% else %}
+                        <div class="profile-avatar bg-primary d-flex align-items-center justify-content-center text-white">
+                            {{ tweet.user.username|first|upper }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Tweet Content -->
+                <div class="flex-grow-1">
+                    <div class="d-flex align-items-center mb-2">
+                        <a href="{% url 'user_profile' tweet.user.username %}" 
+                           class="text-decoration-none fw-bold text-dark me-2">
+                            {{ tweet.user.get_full_name|default:tweet.user.username }}
+                        </a>
+                        <span class="text-muted small">@{{ tweet.user.username }}</span>
+                        <span class="text-muted mx-2">•</span>
+                        <span class="text-muted small">{{ tweet.created_at|timesince }} ago</span>
+                    </div>
+                    
+                    <p class="mb-2">{{ tweet.text }}</p>
+                    
+                    {% if tweet.image %}
+                    <div class="mb-3">
+                        <img src="{{ tweet.image.url }}" alt="Tweet image" 
+                             class="img-fluid rounded" style="max-height: 300px;">
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Tweet Actions -->
+                    <div class="d-flex align-items-center text-muted">
+                        {% if user.is_authenticated %}
+                            {% csrf_token %}
+                            <button class="like-btn me-3 {% if user in tweet.likes.all %}liked{% endif %}" 
+                                    id="like-btn-{{ tweet.id }}" 
+                                    onclick="likeTweet({{ tweet.id }})">
+                                {% if user in tweet.likes.all %}
+                                    <i class="bi bi-heart-fill"></i>
+                                {% else %}
+                                    <i class="bi bi-heart"></i>
+                                {% endif %}
+                            </button>
+                            <span id="like-count-{{ tweet.id }}" class="small me-3">
+                                {{ tweet.get_likes_count }}
+                            </span>
+                        {% else %}
+                            <i class="bi bi-heart me-1"></i>
+                            <span class="small me-3">{{ tweet.get_likes_count }}</span>
+                        {% endif %}
+                        
+                        <i class="bi bi-chat me-1"></i>
+                        <span class="small">Reply</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            
+            <div class="text-center">
+                <a href="{% url 'tweet_list' %}" class="btn btn-outline-primary">
+                    View All Tweets <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        {% if user.is_authenticated %}
+        <!-- User Info -->
+        <div class="sidebar">
+            <div class="d-flex align-items-center mb-3">
+                {% if user.userprofile and user.userprofile.avatar %}
+                    <img src="{{ user.userprofile.avatar.url }}" alt="{{ user.username }}" 
+                         class="profile-avatar me-3">
+                {% else %}
+                    <div class="profile-avatar bg-primary d-flex align-items-center justify-content-center text-white me-3">
+                        {{ user.username|first|upper }}
+                    </div>
+                {% endif %}
+                <div>
+                    <h6 class="mb-0">{{ user.get_full_name|default:user.username }}</h6>
+                    <small class="text-muted">@{{ user.username }}</small>
+                </div>
+            </div>
+            
+            {% if user.userprofile and user.userprofile.bio %}
+            <p class="text-muted small">{{ user.userprofile.bio }}</p>
+            {% endif %}
+            
+            <div class="d-grid">
+                <a href="{% url 'edit_profile' %}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-pencil me-1"></i>Edit Profile
+                </a>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Trending -->
+        <div class="sidebar">
+            <h5 class="mb-3">
+                <i class="bi bi-lightning-fill me-2"></i>What's Happening
+            </h5>
+            <div class="list-group list-group-flush">
+                <div class="list-group-item border-0 px-0">
+                    <div class="small text-muted">Trending in Technology</div>
+                    <div class="fw-bold">#Django</div>
+                    <div class="small text-muted">1,234 Tweets</div>
+                </div>
+                <div class="list-group-item border-0 px-0">
+                    <div class="small text-muted">Trending</div>
+                    <div class="fw-bold">#WebDevelopment</div>
+                    <div class="small text-muted">856 Tweets</div>
+                </div>
+                <div class="list-group-item border-0 px-0">
+                    <div class="small text-muted">Trending in Programming</div>
+                    <div class="fw-bold">#Python</div>
+                    <div class="small text-muted">2,456 Tweets</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Suggestions -->
+        <div class="sidebar">
+            <h5 class="mb-3">
+                <i class="bi bi-people me-2"></i>Who to Follow
+            </h5>
+            <div class="text-muted text-center py-3">
+                <i class="bi bi-person-plus fs-1"></i>
+                <p class="mb-0">Suggestions coming soon!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    function likeTweet(tweetId) {
+        fetch(`/tweet/${tweetId}/like/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            const likeBtn = document.querySelector(`#like-btn-${tweetId}`);
+            const likeCount = document.querySelector(`#like-count-${tweetId}`);
+            
+            if (data.liked) {
+                likeBtn.classList.add('liked');
+                likeBtn.innerHTML = '<i class="bi bi-heart-fill"></i>';
+            } else {
+                likeBtn.classList.remove('liked');
+                likeBtn.innerHTML = '<i class="bi bi-heart"></i>';
+            }
+            
+            likeCount.textContent = data.likes_count;
+        });
+    }
+</script>
+{% endblock %}
+{% endblock %}

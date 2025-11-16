@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Troubleshooting - Twick Documentation</title>
+    <meta name="description" content="Common issues and solutions for Twick Django Twitter clone">
+    
+    <!-- Stylesheets -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link href="../assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">
+                Twick Docs
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="features.html">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="getting-started.html">Getting Started</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="architecture.html">Architecture</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="api-reference.html">API</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="troubleshooting.html">Troubleshooting</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <div class="page-header">
+                <h1><i class="bi bi-tools"></i> Troubleshooting Guide</h1>
+                <p class="lead">Common issues and their solutions to help you resolve problems quickly</p>
+            </div>
+
+            <!-- Search -->
+            <section class="mb-5">
+                <div class="search-container">
+                    <input type="text" id="troubleshootingSearch" class="search-input" placeholder="Search for issues...">
+                    <buttonbutton class="search-btn" title="Search" aria-label="Search">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Quick Solutions -->
+            <section class="mb-5">
+                <h2><i class="bi bi-lightning-charge"></i> Quick Fixes</h2>
+                <div class="row g-3">
+                    <div class="col-md-6 col-lg-3">
+                        <div class="quick-fix-card">
+                            <i class="bi bi-arrow-clockwise"></i>
+                            <h5>Restart Services</h5>
+                            <p>Try restarting Docker or development server</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="quick-fix-card">
+                            <i class="bi bi-database"></i>
+                            <h5>Reset Database</h5>
+                            <p>Clear database and run migrations</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="quick-fix-card">
+                            <i class="bi bi-file-earmark-arrow-down"></i>
+                            <h5>Clear Cache</h5>
+                            <p>Clear browser and Django cache</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="quick-fix-card">
+                            <i class="bi bi-collection"></i>
+                            <h5>Collect Static</h5>
+                            <p>Rebuild static file collections</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Installation Issues -->
+            <section class="mb-5">
+                <h2><i class="bi bi-download"></i> Installation Issues</h2>
+                
+                <div class="accordion" id="installationAccordion">
+                    <div class="accordion-item">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#install-1">
+                                <i class="bi bi-exclamation-triangle text-warning me-2"></i>
+                                Python version compatibility issues
+                            </button>
+                        </h3>
+                        <div id="install-1" class="accordion-collapse collapse show" data-bs-parent="#installationAccordion">
+                            <div class="accordion-body">
+                                <h5>Problem:</h5>
+                                <p>Getting errors related to Python version or package compatibility.</p>
+                                
+                                <h5>Solution:</h5>
+                                <div class="command-card">
+                                    <div class="command-header">
+                                        <i class="bi bi-info-circle"></i>
+                                        <span>Check Python Version</span>
+                                        <button class="copy-btn" onclick="copyToClipboard('python --version')" title="Copy to clipboard">
+                                            <i class="bi bi-clipboard"></i>
+                                        </button>
+                                    </div>
+                                    <div class="command-body">
+                                        <code>python --version  # Should be 3.8 or higher</code>
+                                    </div>
+                                </div>
+                                
+                                <div class="command-card mt-2">
+                                    <div class="command-header">
+                                        <i class="bi bi-terminal"></i>
+                                        <span>Create Virtual Environment with Specific Python</span>
+                                        <button class="copy-btn" onclick="copyToClipboard('python3.9 -m venv venv\nsource venv/bin/activate  # Linux/macOS\nvenv\\Scripts\\activate     # Windows')" title="Copy to clipboard">
+                                            <i class="bi bi-clipboard"></i>
+                                        </button>
+                                    </div>
+                                    <div class="command-body">
+                                        <code>python3.9 -m venv venv<br>source venv/bin/activate  # Linux/macOS<br>venv\Scripts\activate     # Windows</code>
+                                    </div>
+                                </div>
+                                
+                                <div class="alert alert-info mt-2">
+                                    <strong>Install Python 3.8+:</strong><br>
+                                    • Windows: Download from python.org<br>
+                                    • macOS: <code>brew install python@3.9</code><br>
+                                    • Ubuntu: <code>sudo apt install python3.9</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#install-2">
+                                <i class="bi bi-x-circle text-danger me-2"></i>
+                                pip install failures
+                            </button>
+                        </h3>
+                        <div id="install-2" class="accordion-collapse collapse" data-bs-parent="#installationAccordion">
+                            <div class="accordion-body">
+                                <h5>Problem:</h5>
+                                <p>Package installation fails with permission errors or dependency conflicts.</p>
+                                
+                                <h5>Solutions:</h5>
+                                <div class="command-card">
+                                    <div class="command-header">
+                                        <i class="bi bi-arrow-up-circle"></i>
+                                        <span>Upgrade pip first</span>
+                                        <button class="copy-btn" onclick="copyToClipboard('python -m pip install --upgrade pip')" title="Copy to clipboard">
+                                            <i class="bi bi-clipboard"></i>
+                                        </button>
+                                    </div>
+                                    <div class="command-body">
+                                        <code>python -m pip install --upgrade pip</code>
+                                    </div>
+                                </div>
+                                
+                                <div class="command-card mt-2">
+                                    <div class="command-header">
+                                        <i class="bi bi-person-check"></i>
+                                        <span>Install with user flag (permission issues)</span>
+                                        <button class="copy-btn" onclick="copyToClipboard('pip install --user -r requirements.txt')" title="Copy to clipboard">
+                                            <i class="bi bi-clipboard"></i>
+                                        </button>
+                                    </div>
+                                    <div class="command-body">
+                                        <code>pip install --user -r requirements.txt</code>
+                                    </div>
+                                </div>
+                                
+                                <div class="command-card mt-2">
+                                    <div class="command-header">
+                                        <i class="bi bi-trash"></i>
+                                        <span>Clear pip cache</span>
+                                        <button class="copy-btn" onclick="copyToClipboard('pip cache purge')" title="Copy to clipboard">
+                                            <i class="bi bi-clipboard"></i>
+                                        </button>
+                                    </div>
+                                    <div class="command-body">
+                                        <code>pip cache purge</code>
+                                    </div>
+                                </div>
+                                
+                                <div class="command-card mt-2">
+                                    <div class="command-header">
+                                        <i class="bi bi-list-ol"></i>
+                                        <span>Install packages individually</span>
+                                        <button class="copy-btn" onclick="copyToClipboard('pip install django\npip install django-extensions')" title="Copy to clipboard">
+                                            <i class="bi bi-clipboard"></i>
+                                        </button>
+                                    </div>
+                                    <div class="command-body">
+                                        <code>pip install django<br>pip install django-extensions<br># ... continue with other packages</code>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#install-3">
+                                <i class="bi bi-hdd text-info me-2"></i>
+                                Virtual environment issues
+                            </button>
+                        </h3>
+                        <div id="install-3" class="accordion-collapse collapse" data-bs-parent="#installationAccordion">
+                            <div class="accordion-body">
+                                <h5>Problem:</h5>
+                                <p>Virtual environment not working or packages not found.</p>
+                                
+                                <h5>Solutions:</h5>
+                                <div class="alert alert-info mb-3">
+                                    <strong>Check activation:</strong> You should see <code>(venv)</code> in your terminal prompt
+                                </div>
+                                
+                                <div class="command-card">
+                                    <div class="command-header">
+                                        <i class="bi bi-windows"></i>
+                                        <span>Activate on Windows</span>
+                                        <button class="copy-btn" onclick="copyToClipboard('venv\\Scripts\\activate')" title="Copy to clipboard">
+                                            <i class="bi bi-clipboard"></i>
+                                        </button>
+                                    </div>
+                                    <div class="command-body">
+                                        <code>venv\Scripts\activate</code>
+                                    </div>
+                                </div>
+                                
+                                <div class="command-card mt-2">
+                                    <div class="command-header">
+                                        <i class="bi bi-apple"></i>
+                                        <span>Activate on macOS/Linux</span>
+                                        <button class="copy-btn" onclick="copyToClipboard('source venv/bin/activate')" title="Copy to clipboard">
+                                            <i class="bi bi-clipboard"></i>
+                                        </button>
+                                    </div>
+                                    <div class="command-body">
+                                        <code>source venv/bin/activate</code>
+                                    </div>
+                                </div>
+                                
+                                <div class="command-card mt-2">
+                                    <div class="command-header">
+                                        <i class="bi bi-arrow-repeat"></i>
+                                        <span>Recreate Virtual Environment (Linux/macOS)</span>
+                                        <button class="copy-btn" onclick="copyToClipboard('deactivate\nrm -rf venv\npython -m venv venv\nsource venv/bin/activate\npip install -r requirements.txt')" title="Copy to clipboard">
+                                            <i class="bi bi-clipboard"></i>
+                                        </button>
+                                    </div>
+                                    <div class="command-body">
+                                        <code>deactivate<br>rm -rf venv<br>python -m venv venv<br>source venv/bin/activate<br>pip install -r requirements.txt</code>
+                                    </div>
+                                </div>
+                                
+                                <div class="command-card mt-2">
+                                    <div class="command-header">
+                                        <i class="bi bi-windows"></i>
+                                        <span>Recreate Virtual Environment (Windows)</span>
+                                        <button class="copy-btn" onclick="copyToClipboard('deactivate\nrmdir /s venv\npython -m venv venv\nvenv\\Scripts\\activate\npip install -r requirements.txt')" title="Copy to clipboard">
+                                            <i class="bi bi-clipboard"></i>
+                                        </button>
+                                    </div>
+                                    <div class="command-body">
+                                        <code>deactivate<br>rmdir /s venv<br>python -m venv venv<br>venv\Scripts\activate<br>pip install -r requirements.txt</code>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Database Issues -->
+            <section class="mb-5">
+                <h2><i class="bi bi-database"></i> Database Issues</h2>
+                
+                <div class="accordion" id="databaseAccordion">
+                    <div class="accordion-item">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#db-1">
+                                <i class="bi bi-arrow-repeat text-primary me-2"></i>
+                                Migration errors
+                            </button>
+                        </h3>
+                        <div id="db-1" class="accordion-collapse collapse show" data-bs-parent="#databaseAccordion">
+                            <div class="accordion-body">
+                                <h5>Problem:</h5>
+                                <p>Database migration fails or shows conflicting migrations.</p>
+                                
+                                <h5>Solutions:</h5>
+                                <pre><code class="language-bash"># Check migration status
+python manage.py showmigrations
+
+# Reset specific app migrations (DEVELOPMENT ONLY)
+python manage.py migrate tweet zero
+python manage.py migrate
+
+# Reset all migrations (DEVELOPMENT ONLY)
+rm db.sqlite3
+find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
+find . -path "*/migrations/*.pyc" -delete
+python manage.py makemigrations
+python manage.py migrate
+
+# For production, create a new migration file
+python manage.py makemigrations --merge</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#db-2">
+                                <i class="bi bi-lock text-warning me-2"></i>
+                                Database is locked
+                            </button>
+                        </h3>
+                        <div id="db-2" class="accordion-collapse collapse" data-bs-parent="#databaseAccordion">
+                            <div class="accordion-body">
+                                <h5>Problem:</h5>
+                                <p>SQLite database is locked or in use by another process.</p>
+                                
+                                <h5>Solutions:</h5>
+                                <pre><code class="language-bash"># Stop all Django processes
+# Kill any runserver processes
+ps aux | grep manage.py  # Find the process ID
+kill -9 [PID]
+
+# Windows: Use Task Manager or
+tasklist | findstr python
+taskkill /PID [PID] /F
+
+# If database is still locked, restart your computer
+# Or delete the database file (development only)
+rm db.sqlite3
+python manage.py migrate</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#db-3">
+                                <i class="bi bi-table text-success me-2"></i>
+                                Table doesn't exist errors
+                            </button>
+                        </h3>
+                        <div id="db-3" class="accordion-collapse collapse" data-bs-parent="#databaseAccordion">
+                            <div class="accordion-body">
+                                <h5>Problem:</h5>
+                                <p>Getting "table doesn't exist" errors when accessing the application.</p>
+                                
+                                <h5>Solutions:</h5>
+                                <pre><code class="language-bash"># Run migrations
+python manage.py migrate
+
+# If that doesn't work, check if migrations exist
+python manage.py showmigrations
+
+# Create migrations if they don't exist
+python manage.py makemigrations
+
+# Then migrate
+python manage.py migrate
+
+# Create superuser after migrations
+python manage.py createsuperuser</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Server Issues -->
+            <section class="mb-5">
+                <h2><i class="bi bi-server"></i> Server Issues</h2>
+                
+                <div class="accordion" id="serverAccordion">
+                    <div class="accordion-item">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#server-1">
+                                <i class="bi bi-globe text-info me-2"></i>
+                                Port already in use
+                            </button>
+                        </h3>
+                        <div id="server-1" class="accordion-collapse collapse show" data-bs-parent="#serverAccordion">
+                            <div class="accordion-body">
+                                <h5>Problem:</h5>
+                                <p>Cannot start server because port 8000 is already in use.</p>
+                                
+                                <h5>Solutions:</h5>
+                                <pre><code class="language-bash"># Use a different port
+python manage.py runserver 8080
+python manage.py runserver 0.0.0.0:8000
+
+# Find and kill process using port 8000
+# Windows
+netstat -ano | findstr :8000
+taskkill /PID [PID_NUMBER] /F
+
+# macOS/Linux
+lsof -i :8000
+sudo kill -9 [PID_NUMBER]
+
+# Or use a specific port range
+python manage.py runserver 8001</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#server-2">
+                                <i class="bi bi-exclamation-triangle text-warning me-2"></i>
+                                Server won't start
+                            </button>
+                        </h3>
+                        <div id="server-2" class="accordion-collapse collapse" data-bs-parent="#serverAccordion">
+                            <div class="accordion-body">
+                                <h5>Problem:</h5>
+                                <p>Django development server fails to start with various errors.</p>
+                                
+                                <h5>Solutions:</h5>
+                                <pre><code class="language-bash"># Check for syntax errors in settings
+python manage.py check
+
+# Validate models
+python manage.py check
+
+# Run with verbose output to see detailed errors
+python manage.py runserver --verbosity=2
+
+# Check if all required environment variables are set
+# Create .env file with necessary variables</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Static Files Issues -->
+            <section class="mb-5">
+                <h2><i class="bi bi-file-earmark-code"></i> Static Files Issues</h2>
+                
+                <div class="accordion" id="staticAccordion">
+                    <div class="accordion-item">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#static-1">
+                                <i class="bi bi-css text-primary me-2"></i>
+                                CSS/JS files not loading
+                            </button>
+                        </h3>
+                        <div id="static-1" class="accordion-collapse collapse show" data-bs-parent="#staticAccordion">
+                            <div class="accordion-body">
+                                <h5>Problem:</h5>
+                                <p>Stylesheets and JavaScript files are not loading, resulting in broken layout.</p>
+                                
+                                <h5>Solutions:</h5>
+                                <pre><code class="language-bash"># Collect static files
+python manage.py collectstatic --clear
+
+# Check settings.py for correct static file configuration
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
+# For development, make sure DEBUG=True
+DEBUG = True
+
+# Clear browser cache or open in incognito mode
+# Check browser developer tools for 404 errors</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#static-2">
+                                <i class="bi bi-image text-success me-2"></i>
+                                Media files not displaying
+                            </button>
+                        </h3>
+                        <div id="static-2" class="accordion-collapse collapse" data-bs-parent="#staticAccordion">
+                            <div class="accordion-body">
+                                <h5>Problem:</h5>
+                                <p>User uploaded images and media files are not displaying.</p>
+                                
+                                <h5>Solutions:</h5>
+                                <pre><code class="language-bash"># Check media settings in settings.py
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Make sure URLs are configured in main urls.py
+from django.conf import settings
+from django.conf.urls.static import static
+
+urlpatterns = [
+    # ... your url patterns
+]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Docker Issues -->
+            <section class="mb-5">
+                <h2><i class="bi bi-box"></i> Docker Issues</h2>
+                
+                <div class="accordion" id="dockerAccordion">
+                    <div class="accordion-item">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#docker-1">
+                                <i class="bi bi-arrow-up-circle text-info me-2"></i>
+                                Docker compose up fails
+                            </button>
+                        </h3>
+                        <div id="docker-1" class="accordion-collapse collapse show" data-bs-parent="#dockerAccordion">
+                            <div class="accordion-body">
+                                <h5>Problem:</h5>
+                                <p>Docker containers fail to start or build properly.</p>
+                                
+                                <h5>Solutions:</h5>
+                                <pre><code class="language-bash"># Stop all containers and rebuild
+docker-compose down
+docker-compose build --no-cache
+docker-compose up -d
+
+# Check logs for specific service
+docker-compose logs web
+docker-compose logs db
+
+# Remove all containers and volumes (WARNING: destroys data)
+docker-compose down -v
+docker system prune -af</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#docker-2">
+                                <i class="bi bi-hdd-network text-warning me-2"></i>
+                                Database connection issues in Docker
+                            </button>
+                        </h3>
+                        <div id="docker-2" class="accordion-collapse collapse" data-bs-parent="#dockerAccordion">
+                            <div class="accordion-body">
+                                <h5>Problem:</h5>
+                                <p>Django app cannot connect to PostgreSQL database in Docker.</p>
+                                
+                                <h5>Solutions:</h5>
+                                <pre><code class="language-bash"># Wait for database to be ready
+# Add health checks to docker-compose.yml
+depends_on:
+  db:
+    condition: service_healthy
+
+# Use database hostname as defined in docker-compose.yml
+# In settings.py:
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'twick',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': 'db',  # This should match service name
+        'PORT': '5432',
+    }
+}</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Performance Issues -->
+            <section class="mb-5">
+                <h2><i class="bi bi-speedometer2"></i> Performance Issues</h2>
+                
+                <div class="accordion" id="performanceAccordion">
+                    <div class="accordion-item">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#perf-1">
+                                <i class="bi bi-hourglass-split text-warning me-2"></i>
+                                Slow page loading
+                            </button>
+                        </h3>
+                        <div id="perf-1" class="accordion-collapse collapse show" data-bs-parent="#performanceAccordion">
+                            <div class="accordion-body">
+                                <h5>Problem:</h5>
+                                <p>Pages are loading slowly or timing out.</p>
+                                
+                                <h5>Solutions:</h5>
+                                <pre><code class="language-bash"># Enable Django debug toolbar for development
+pip install django-debug-toolbar
+
+# Check for N+1 query problems
+# Use select_related() and prefetch_related() in views
+
+# Enable caching
+# Install Redis and configure Django cache
+
+# Optimize database queries
+python manage.py shell
+from django.db import connection
+print(connection.queries)  # See all queries executed</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Get Help -->
+            <section class="mb-5">
+                <h2><i class="bi bi-question-circle"></i> Still Need Help?</h2>
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="card text-center h-100">
+                            <div class="card-body">
+                                <i class="bi bi-linkedin display-4 text-primary"></i>
+                                <h5 class="card-title">GitHub Issues</h5>
+                                <p class="card-text">Report bugs or request features on our GitHub repository.</p>
+                                <a href="https://www.linkedin.com/in/karan-patel-16700a215/" class="btn btn-primary" target="_blank" rel="noopener">Connect on LinkedIn</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card text-center h-100">
+                            <div class="card-body">
+                                <i class="bi bi-chat-dots display-4 text-primary"></i>
+                                <h5 class="card-title">Community Discord</h5>
+                                <p class="card-text">Join our Discord community for real-time help and discussions.</p>
+                                <a href="https://discord.gg/twick" class="btn btn-primary" target="_blank" rel="noopener">Join Discord</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card text-center h-100">
+                            <div class="card-body">
+                                <i class="bi bi-envelope display-4 text-success"></i>
+                                <h5 class="card-title">Email Support</h5>
+                                <p class="card-text">Send us an email for technical support and questions.</p>
+                                <a href="mailto:support@twick.dev" class="btn btn-success">Send Email</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Navigation -->
+            <nav class="page-nav">
+                <a href="getting-started.html" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left"></i> Getting Started
+                </a>
+                <a href="../index.html" class="btn btn-primary">
+                    <i class="bi bi-house"></i> Back to Home
+                </a>
+            </nav>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <p>&copy; 2024 Twick Documentation. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <a href="https://www.linkedin.com/in/karan-patel-16700a215/" target="_blank" rel="noopener">
+                        <i class="bi bi-linkedin"></i> LinkedIn
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script src="../assets/js/main.js"></script>
+    
+    <script>
+        // Simple search functionality for troubleshooting
+        document.getElementById('troubleshootingSearch').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const accordionItems = document.querySelectorAll('.accordion-item');
+            
+            accordionItems.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(searchTerm) || searchTerm === '') {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

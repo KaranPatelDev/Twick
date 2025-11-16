@@ -1,0 +1,93 @@
+# Django Project .gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# Environment variables
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary and Debug Files
+debug_*.py
+test_*.py
+validate_*.py
+fix_*.py
+*_SUMMARY.md
+*_FIXED.md
+*_COMPLETE.md
+demo.js
+docker_run_commands.txt
+generate_pdf.py
+ADMIN_ACCESS_GUIDE.md
+CLEANUP_GUIDE.md
+
+# Documentation duplicates (keep only in docs/ folder)
+/USER_MANUAL.md
+/USER_MANUAL.pdf
+
+# Generated documentation files (can be regenerated)
+TECHNICAL_DOCUMENTATION*.md
+TECHNICAL_DOCUMENTATION*.html
+generate_documentation.py
+open_documentation.bat
+DOCUMENTATION_README.md
+
+# Docker
+.dockerignore
+
+# Node modules (if any)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

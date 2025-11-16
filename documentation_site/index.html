@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twick Documentation - Complete Twitter-Like Social Media Platform</title>
+    <meta name="description" content="Comprehensive documentation for Twick - A complete Django-based Twitter-like social media platform with advanced features, Docker deployment, and modern UI.">
+    <meta name="keywords" content="Django, Twitter clone, Social media, Python, Docker, REST API, Documentation">
+    <meta name="author" content="Twick Development Team">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Twick Documentation">
+    <meta property="og:description" content="Complete documentation for Twick social media platform">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://twick-docs.netlify.app">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
+
+    <!-- Stylesheets -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link href="assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#home">
+                Twick Docs
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#home">Home</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Guides
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="pages/getting-started.html"><i class="bi bi-rocket"></i> Getting Started</a></li>
+                            <li><a class="dropdown-item" href="pages/features.html"><i class="bi bi-star"></i> Features</a></li>
+                            <li><a class="dropdown-item" href="pages/architecture.html"><i class="bi bi-diagram-3"></i> Architecture</a></li>
+                            <li><a class="dropdown-item" href="pages/troubleshooting.html"><i class="bi bi-tools"></i> Troubleshooting</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="pages/api-reference.html">API</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="pages/containerization.html">Containerization</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Community
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="pages/contributing.html"><i class="bi bi-people"></i> Contributing</a></li>
+                            <li><a class="dropdown-item" href="pages/changelog.html"><i class="bi bi-clock-history"></i> Changelog</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="https://www.linkedin.com/in/karan-patel-16700a215/" target="_blank" rel="noopener"><i class="bi bi-linkedin"></i> LinkedIn</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Twick Documentation</h1>
+                <p class="lead">Complete documentation for a Django-based Twitter-like social media platform with advanced features, real-time messaging, and modern UI.</p>
+                <div class="hero-actions">
+                    <a href="#installation" class="btn-hero">Get Started</a>
+                    <a href="https://www.linkedin.com/in/karan-patel-16700a215/" class="btn-hero" target="_blank" rel="noopener">
+                        <i class="bi bi-linkedin"></i> Connect on LinkedIn
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Search Section -->
+    <section class="section">
+        <div class="container">
+            <div class="search-container">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search documentation...">
+                <button id="searchBtn" class="search-btn">
+                    <i class="bi bi-search"></i>
+                </button>
+                <div id="searchResults" class="search-results" style="display: none;"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Overview Section -->
+    <section id="overview" class="section section-alt">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h2>Project Overview</h2>
+                    <p class="lead">Twick is a comprehensive social media platform built with Django that replicates and extends Twitter's functionality with modern features and robust architecture.</p>
+                </div>
+            </div>
+            
+            <div class="row mt-5">
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="bi bi-code-slash"></i>
+                            </div>
+                            <div>
+                                <h4 class="card-title">Modern Technology Stack</h4>
+                            </div>
+                        </div>
+                        <div class="card-description">
+                            Built with Django 5.1.1, Python 3.12+, Bootstrap 5, and PostgreSQL for a robust and scalable foundation.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="bi bi-people"></i>
+                            </div>
+                            <div>
+                                <h4 class="card-title">Social Features</h4>
+                            </div>
+                        </div>
+                        <div class="card-description">
+                            Complete social media functionality including tweets, likes, comments, follows, direct messaging, and real-time notifications.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="bi bi-shield-check"></i>
+                            </div>
+                            <div>
+                                <h4 class="card-title">Enterprise Ready</h4>
+                            </div>
+                        </div>
+                        <div class="card-description">
+                            Production-ready with Docker deployment, comprehensive testing, security features, and detailed documentation.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="section">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2>Core Features</h2>
+                <p class="lead">Everything you need for a complete social media platform</p>
+            </div>
+            
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="bi bi-chat-dots"></i>
+                    </div>
+                    <h4>Tweet Management</h4>
+                    <p>Create, edit, delete tweets with image support, character limits, and privacy controls.</p>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="bi bi-heart"></i>
+                    </div>
+                    <h4>Engagement System</h4>
+                    <p>Like, comment, reply system with real-time updates and notification system.</p>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="bi bi-person-plus"></i>
+                    </div>
+                    <h4>Follow System</h4>
+                    <p>Follow/unfollow users with support for private accounts and follow requests.</p>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="bi bi-envelope"></i>
+                    </div>
+                    <h4>Direct Messaging</h4>
+                    <p>Private messaging system with group chats and file sharing capabilities.</p>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="bi bi-hash"></i>
+                    </div>
+                    <h4>Hashtag System</h4>
+                    <p>Automatic hashtag detection, trending topics, and hashtag-based discovery.</p>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="bi bi-bell"></i>
+                    </div>
+                    <h4>Notifications</h4>
+                    <p>Real-time notifications for likes, comments, follows, and direct messages.</p>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="bi bi-search"></i>
+                    </div>
+                    <h4>Search & Discovery</h4>
+                    <p>Advanced search functionality for users, tweets, and hashtags with filters.</p>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="bi bi-gear"></i>
+                    </div>
+                    <h4>User Profiles</h4>
+                    <p>Comprehensive user profiles with avatars, bios, and customizable themes.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Installation Section -->
+    <section id="installation" class="section section-alt">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <h2>Quick Installation</h2>
+                    <p class="lead">Get Twick up and running in minutes with Docker or local development setup.</p>
+                    
+                    <!-- Installation Tabs -->
+                    <div class="tab-nav mb-4">
+                        <button class="tab-btn active" data-tab="docker-install">
+                            <i class="bi bi-box"></i> Docker
+                        </button>
+                        <button class="tab-btn" data-tab="local-install">
+                            <i class="bi bi-laptop"></i> Local Development
+                        </button>
+                        <button class="tab-btn" data-tab="production-install">
+                            <i class="bi bi-cloud"></i> Production
+                        </button>
+                    </div>
+                    
+                    <!-- Docker Installation -->
+                    <div id="docker-install" class="tab-content active">
+                        <div class="alert alert-info mb-4">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Prerequisites:</strong> Docker and Docker Compose installed on your system.
+                        </div>
+                        
+                        <div class="installation-steps">
+                            <div class="step-card">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <h5>Clone the Repository</h5>
+                                    <p>Download the Twick source code to your local machine</p>
+                                    <div class="command-card">
+                                        <i class="bi bi-terminal me-2"></i>
+                                        <code>git clone https://github.com/yourusername/twick.git</code>
+                                        <button class="copy-cmd-btn" onclick="copyToClipboard('git clone https://github.com/yourusername/twick.git')" title="Copy command">
+                                            <i class="bi bi-copy"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="step-card">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <h5>Navigate to Directory</h5>
+                                    <p>Change to the project directory</p>
+                                    <div class="command-card">
+                                        <i class="bi bi-terminal me-2"></i>
+                                        <code>cd twick</code>
+                                        <button class="copy-cmd-btn" onclick="copyToClipboard('cd twick')" title="Copy command">
+                                            <i class="bi bi-copy"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="step-card">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <h5>Build and Start</h5>
+                                    <p>Build Docker images and start all services</p>
+                                    <div class="command-card">
+                                        <i class="bi bi-terminal me-2"></i>
+                                        <code>docker-compose up --build</code>
+                                        <button class="copy-cmd-btn" onclick="copyToClipboard('docker-compose up --build')" title="Copy command">
+                                            <i class="bi bi-copy"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="step-card success">
+                                <div class="step-number"><i class="bi bi-check"></i></div>
+                                <div class="step-content">
+                                    <h5>Ready!</h5>
+                                    <p>The application will be available at <strong>http://localhost:8000</strong></p>
+                                    <a href="http://localhost:8000" class="btn btn-success btn-sm" target="_blank" rel="noopener">
+                                        <i class="bi bi-arrow-up-right-square"></i> Open Application
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Local Installation -->
+                    <div id="local-install" class="tab-content">
+                        <div class="alert alert-info mb-4">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Prerequisites:</strong> Python 3.12+, pip, and virtualenv installed.
+                        </div>
+                        
+                        <div class="installation-steps">
+                            <div class="step-card">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <h5>Clone Repository</h5>
+                                    <p>Download the source code</p>
+                                    <div class="command-card">
+                                        <i class="bi bi-terminal me-2"></i>
+                                        <code>git clone https://github.com/yourusername/twick.git && cd twick</code>
+                                        <button class="copy-cmd-btn" onclick="copyToClipboard('git clone https://github.com/yourusername/twick.git && cd twick')" title="Copy command">
+                                            <i class="bi bi-copy"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="step-card">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <h5>Create Virtual Environment</h5>
+                                    <p>Isolate project dependencies</p>
+                                    <div class="command-card">
+                                        <i class="bi bi-terminal me-2"></i>
+                                        <code>python -m venv twick_env</code>
+                                        <button class="copy-cmd-btn" onclick="copyToClipboard('python -m venv twick_env')" title="Copy command">
+                                            <i class="bi bi-copy"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="step-card">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <h5>Activate Environment</h5>
+                                    <p>Activate the virtual environment</p>
+                                    <div class="command-card">
+                                        <i class="bi bi-terminal me-2"></i>
+                                        <code>source twick_env/bin/activate</code>
+                                        <button class="copy-cmd-btn" onclick="copyToClipboard('source twick_env/bin/activate')" title="Copy command">
+                                            <i class="bi bi-copy"></i>
+                                        </button>
+                                    </div>
+                                    <small class="text-muted">On Windows: <code>twick_env\Scripts\activate</code></small>
+                                </div>
+                            </div>
+                            
+                            <div class="step-card">
+                                <div class="step-number">4</div>
+                                <div class="step-content">
+                                    <h5>Install Dependencies</h5>
+                                    <p>Install required Python packages</p>
+                                    <div class="command-card">
+                                        <i class="bi bi-terminal me-2"></i>
+                                        <code>pip install -r requirements.txt</code>
+                                        <button class="copy-cmd-btn" onclick="copyToClipboard('pip install -r requirements.txt')" title="Copy command">
+                                            <i class="bi bi-copy"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="step-card">
+                                <div class="step-number">5</div>
+                                <div class="step-content">
+                                    <h5>Setup Database</h5>
+                                    <p>Initialize database and create admin user</p>
+                                    <div class="command-card mb-2">
+                                        <i class="bi bi-terminal me-2"></i>
+                                        <code>python manage.py migrate</code>
+                                        <button class="copy-cmd-btn" onclick="copyToClipboard('python manage.py migrate')" title="Copy command">
+                                            <i class="bi bi-copy"></i>
+                                        </button>
+                                    </div>
+                                    <div class="command-card">
+                                        <i class="bi bi-terminal me-2"></i>
+                                        <code>python manage.py createsuperuser</code>
+                                        <button class="copy-cmd-btn" onclick="copyToClipboard('python manage.py createsuperuser')" title="Copy command">
+                                            <i class="bi bi-copy"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="step-card">
+                                <div class="step-number">6</div>
+                                <div class="step-content">
+                                    <h5>Run Development Server</h5>
+                                    <p>Start the Django development server</p>
+                                    <div class="command-card">
+                                        <i class="bi bi-terminal me-2"></i>
+                                        <code>python manage.py runserver</code>
+                                        <button class="copy-cmd-btn" onclick="copyToClipboard('python manage.py runserver')" title="Copy command">
+                                            <i class="bi bi-copy"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="step-card success">
+                                <div class="step-number"><i class="bi bi-check"></i></div>
+                                <div class="step-content">
+                                    <h5>Development Ready!</h5>
+                                    <p>Access your application at <strong>http://127.0.0.1:8000</strong></p>
+                                    <a href="http://127.0.0.1:8000" class="btn btn-success btn-sm" target="_blank" rel="noopener">
+                                        <i class="bi bi-arrow-up-right-square"></i> Open Application
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Production Installation -->
+                    <div id="production-install" class="tab-content">
+                        <div class="alert alert-warning mb-4">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            <strong>Production Setup:</strong> Includes PostgreSQL, Redis, and Nginx configuration.
+                        </div>
+                        
+                        <div class="installation-steps">
+                            <div class="step-card">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <h5>Production Deployment</h5>
+                                    <p>Deploy using production Docker Compose configuration</p>
+                                    <div class="command-card">
+                                        <i class="bi bi-terminal me-2"></i>
+                                        <code>docker-compose -f docker-compose.prod.yml up --build -d</code>
+                                        <button class="copy-cmd-btn" onclick="copyToClipboard('docker-compose -f docker-compose.prod.yml up --build -d')" title="Copy command">
+                                            <i class="bi bi-copy"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="step-card">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <h5>Alternative: Production Script</h5>
+                                    <p>Use the automated production setup script</p>
+                                    <div class="command-card mb-2">
+                                        <i class="bi bi-terminal me-2"></i>
+                                        <code>chmod +x start_prod.sh</code>
+                                        <button class="copy-cmd-btn" onclick="copyToClipboard('chmod +x start_prod.sh')" title="Copy command">
+                                            <i class="bi bi-copy"></i>
+                                        </button>
+                                    </div>
+                                    <div class="command-card">
+                                        <i class="bi bi-terminal me-2"></i>
+                                        <code>./start_prod.sh</code>
+                                        <button class="copy-cmd-btn" onclick="copyToClipboard('./start_prod.sh')" title="Copy command">
+                                            <i class="bi bi-copy"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="step-card">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <h5>Environment Configuration</h5>
+                                    <p>Set up production environment variables</p>
+                                    <div class="command-card mb-2">
+                                        <i class="bi bi-terminal me-2"></i>
+                                        <code>cp .env.example .env</code>
+                                        <button class="copy-cmd-btn" onclick="copyToClipboard('cp .env.example .env')" title="Copy command">
+                                            <i class="bi bi-copy"></i>
+                                        </button>
+                                    </div>
+                                    <small class="text-muted">Edit .env with your production settings (database URL, secret key, etc.)</small>
+                                </div>
+                            </div>
+                            
+                            <div class="step-card">
+                                <div class="step-number">4</div>
+                                <div class="step-content">
+                                    <h5>SSL Certificate (Recommended)</h5>
+                                    <p>Set up HTTPS with Let's Encrypt</p>
+                                    <div class="command-card">
+                                        <i class="bi bi-terminal me-2"></i>
+                                        <code>certbot --nginx -d yourdomain.com</code>
+                                        <button class="copy-cmd-btn" onclick="copyToClipboard('certbot --nginx -d yourdomain.com')" title="Copy command">
+                                            <i class="bi bi-copy"></i>
+                                        </button>
+                                    </div>
+                                    <small class="text-muted">Replace yourdomain.com with your actual domain</small>
+                                </div>
+                            </div>
+                            
+                            <div class="step-card success">
+                                <div class="step-number"><i class="bi bi-cloud-check"></i></div>
+                                <div class="step-content">
+                                    <h5>Production Ready!</h5>
+                                    <p>Your Twick application is now running in production mode with all optimizations enabled.</p>
+                                    <div class="mt-2">
+                                        <span class="badge bg-success me-2">✓ Docker Containers</span>
+                                        <span class="badge bg-success me-2">✓ Database</span>
+                                        <span class="badge bg-success me-2">✓ Redis Cache</span>
+                                        <span class="badge bg-success">✓ Nginx Proxy</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- API Documentation Section -->
+    <section id="api" class="section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="sidebar">
+                        <h4>API Endpoints</h4>
+                        <ul class="sidebar-nav">
+                            <li><a href="#api-auth">Authentication</a></li>
+                            <li><a href="#api-tweets">Tweets</a></li>
+                            <li><a href="#api-users">Users</a></li>
+                            <li><a href="#api-social">Social Features</a></li>
+                            <li><a href="#api-messaging">Messaging</a></li>
+                            <li><a href="#api-search">Search</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="col-lg-8">
+                    <h2>API Documentation</h2>
+                    <p class="lead">RESTful API endpoints for all Twick functionality.</p>
+                    
+                    <div id="api-auth" class="mb-5">
+                        <h3>Authentication</h3>
+                        <p>Twick uses Django's built-in authentication system with session-based authentication for web interface and token-based authentication for API access.</p>
+                        
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Method</th>
+                                        <th>Endpoint</th>
+                                        <th>Description</th>
+                                        <th>Authentication</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span class="badge">POST</span></td>
+                                        <td><code>/register/</code></td>
+                                        <td>User registration</td>
+                                        <td>Not required</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge">POST</span></td>
+                                        <td><code>/login/</code></td>
+                                        <td>User login</td>
+                                        <td>Not required</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge">POST</span></td>
+                                        <td><code>/logout/</code></td>
+                                        <td>User logout</td>
+                                        <td>Required</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div id="api-tweets" class="mb-5">
+                        <h3>Tweet Management</h3>
+                        <p>Create, read, update, and delete tweets with full CRUD operations.</p>
+                        
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Method</th>
+                                        <th>Endpoint</th>
+                                        <th>Description</th>
+                                        <th>Authentication</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span class="badge">GET</span></td>
+                                        <td><code>/tweets/</code></td>
+                                        <td>List all tweets</td>
+                                        <td>Optional</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge">POST</span></td>
+                                        <td><code>/tweets/create/</code></td>
+                                        <td>Create new tweet</td>
+                                        <td>Required</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge">GET</span></td>
+                                        <td><code>/tweet/&lt;id&gt;/</code></td>
+                                        <td>Get tweet details</td>
+                                        <td>Optional</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge">PUT</span></td>
+                                        <td><code>/tweet/&lt;id&gt;/edit/</code></td>
+                                        <td>Edit tweet</td>
+                                        <td>Required (Owner)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge badge-danger">DELETE</span></td>
+                                        <td><code>/tweet/&lt;id&gt;/delete/</code></td>
+                                        <td>Delete tweet</td>
+                                        <td>Required (Owner)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge">POST</span></td>
+                                        <td><code>/tweet/&lt;id&gt;/like/</code></td>
+                                        <td>Like/unlike tweet</td>
+                                        <td>Required</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div id="api-users" class="mb-5">
+                        <h3>User Management</h3>
+                        <p>User profile management and social connections.</p>
+                        
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Method</th>
+                                        <th>Endpoint</th>
+                                        <th>Description</th>
+                                        <th>Authentication</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span class="badge">GET</span></td>
+                                        <td><code>/profile/&lt;username&gt;/</code></td>
+                                        <td>View user profile</td>
+                                        <td>Optional</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge">POST</span></td>
+                                        <td><code>/profile/edit/</code></td>
+                                        <td>Edit own profile</td>
+                                        <td>Required</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge">POST</span></td>
+                                        <td><code>/profile/&lt;username&gt;/follow/</code></td>
+                                        <td>Follow/unfollow user</td>
+                                        <td>Required</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge">GET</span></td>
+                                        <td><code>/profile/&lt;username&gt;/followers/</code></td>
+                                        <td>List user followers</td>
+                                        <td>Optional</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="api-social" class="mb-5">
+                        <h3>Social Features</h3>
+                        <p>Follow/unfollow users, like tweets, and manage social interactions.</p>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="api-endpoint-card">
+                                    <div class="api-method get">GET</div>
+                                    <div class="api-content">
+                                        <h5>/profile/&lt;username&gt;/followers/</h5>
+                                        <p>Get list of user followers</p>
+                                        <span class="api-auth optional">Authentication: Optional</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="api-endpoint-card">
+                                    <div class="api-method get">GET</div>
+                                    <div class="api-content">
+                                        <h5>/profile/&lt;username&gt;/following/</h5>
+                                        <p>Get list of users being followed</p>
+                                        <span class="api-auth optional">Authentication: Optional</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="api-endpoint-card">
+                                    <div class="api-method post">POST</div>
+                                    <div class="api-content">
+                                        <h5>/profile/&lt;username&gt;/follow/</h5>
+                                        <p>Follow or unfollow a user</p>
+                                        <span class="api-auth required">Authentication: Required</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="api-endpoint-card">
+                                    <div class="api-method post">POST</div>
+                                    <div class="api-content">
+                                        <h5>/tweet/&lt;id&gt;/like/</h5>
+                                        <p>Like or unlike a tweet</p>
+                                        <span class="api-auth required">Authentication: Required</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="api-messaging" class="mb-5">
+                        <h3>Direct Messaging</h3>
+                        <p>Private messaging system with conversation management.</p>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="api-endpoint-card">
+                                    <div class="api-method get">GET</div>
+                                    <div class="api-content">
+                                        <h5>/conversations/</h5>
+                                        <p>List all user conversations</p>
+                                        <span class="api-auth required">Authentication: Required</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="api-endpoint-card">
+                                    <div class="api-method post">POST</div>
+                                    <div class="api-content">
+                                        <h5>/conversations/create/</h5>
+                                        <p>Start new conversation</p>
+                                        <span class="api-auth required">Authentication: Required</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="api-endpoint-card">
+                                    <div class="api-method get">GET</div>
+                                    <div class="api-content">
+                                        <h5>/conversation/&lt;id&gt;/messages/</h5>
+                                        <p>Get messages in conversation</p>
+                                        <span class="api-auth required">Authentication: Required</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="api-endpoint-card">
+                                    <div class="api-method post">POST</div>
+                                    <div class="api-content">
+                                        <h5>/conversation/&lt;id&gt;/send/</h5>
+                                        <p>Send message in conversation</p>
+                                        <span class="api-auth required">Authentication: Required</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="api-search" class="mb-5">
+                        <h3>Search & Discovery</h3>
+                        <p>Search for users, tweets, and hashtags with advanced filtering.</p>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="api-endpoint-card">
+                                    <div class="api-method get">GET</div>
+                                    <div class="api-content">
+                                        <h5>/search/tweets/</h5>
+                                        <p>Search tweets by content</p>
+                                        <span class="api-auth optional">Authentication: Optional</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="api-endpoint-card">
+                                    <div class="api-method get">GET</div>
+                                    <div class="api-content">
+                                        <h5>/search/users/</h5>
+                                        <p>Search users by username/name</p>
+                                        <span class="api-auth optional">Authentication: Optional</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="api-endpoint-card">
+                                    <div class="api-method get">GET</div>
+                                    <div class="api-content">
+                                        <h5>/search/hashtags/</h5>
+                                        <p>Search by hashtag</p>
+                                        <span class="api-auth optional">Authentication: Optional</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="api-endpoint-card">
+                                    <div class="api-method get">GET</div>
+                                    <div class="api-content">
+                                        <h5>/trending/</h5>
+                                        <p>Get trending hashtags</p>
+                                        <span class="api-auth optional">Authentication: Optional</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Containerization Section -->
+    <section id="deployment" class="section section-alt">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <h2><i class="bi bi-box"></i> Containerization & Docker</h2>
+                    <p class="lead">Complete Docker containerization setup for development and production deployment.</p>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="card-icon">
+                                        <i class="bi bi-boxes"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="card-title">Docker Compose</h4>
+                                    </div>
+                                </div>
+                                <div class="card-description">
+                                    Multi-container setup with Django, PostgreSQL, Redis, and Nginx using Docker Compose.
+                                    <br><br>
+                                    <a href="pages/containerization.html#docker-compose" class="btn btn-outline">Learn More</a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="card-icon">
+                                        <i class="bi bi-cloud-arrow-up"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="card-title">Production Ready</h4>
+                                    </div>
+                                </div>
+                                <div class="card-description">
+                                    Production-optimized Docker images with security best practices and performance tuning.
+                                    <br><br>
+                                    <a href="pages/containerization.html#production" class="btn btn-outline">Production Setup</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="code-card mt-4">
+                        <div class="code-header">
+                            <i class="bi bi-file-earmark-code"></i>
+                            <span>docker-compose.yml - Complete containerized setup</span>
+                            <button class="copy-btn" onclick="copyToClipboard(`version: '3.8'
+services:
+  web:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=True
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/twick
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ./media:/app/media
+      - ./static:/app/static
+
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=twick
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    
+volumes:
+  postgres_data:`)" title="Copy to clipboard">
+                                <i class="bi bi-clipboard"></i>
+                                Copy
+                            </button>
+                        </div>
+                        <div class="code-body">
+version: '3.8'<br>
+services:<br>
+  web:<br>
+    build: <br>
+      context: .<br>
+      dockerfile: Dockerfile<br>
+    ports:<br>
+      - "8000:8000"<br>
+    environment:<br>
+      - DEBUG=True<br>
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/twick<br>
+      - REDIS_URL=redis://redis:6379/0<br>
+    depends_on:<br>
+      - db<br>
+      - redis<br>
+    volumes:<br>
+      - ./media:/app/media<br>
+      - ./static:/app/static<br><br>
+
+  db:<br>
+    image: postgres:15<br>
+    environment:<br>
+      - POSTGRES_DB=twick<br>
+      - POSTGRES_USER=postgres<br>
+      - POSTGRES_PASSWORD=postgres<br>
+    volumes:<br>
+      - postgres_data:/var/lib/postgresql/data<br>
+    ports:<br>
+      - "5432:5432"<br><br>
+
+  redis:<br>
+    image: redis:7-alpine<br>
+    ports:<br>
+      - "6379:6379"<br>
+    <br>
+volumes:<br>
+  postgres_data:
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info mt-4">
+                        <h5><i class="bi bi-info-circle"></i> Container Features</h5>
+                        <ul class="mb-0">
+                            <li><strong>Multi-stage builds</strong> for optimized production images</li>
+                            <li><strong>Health checks</strong> for service monitoring and reliability</li>
+                            <li><strong>Volume management</strong> for persistent data and media files</li>
+                            <li><strong>Environment variables</strong> for configuration management</li>
+                            <li><strong>Network isolation</strong> for security and service communication</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Documentation Pages Section -->
+    <section class="section section-alt">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h2><i class="bi bi-book"></i> Complete Documentation</h2>
+                    <p class="lead">Explore all aspects of Twick with our comprehensive documentation</p>
+                </div>
+            </div>
+            <div class="row g-4 mt-4">
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="bi bi-rocket-takeoff"></i>
+                            </div>
+                            <div>
+                                <h4 class="card-title">Getting Started</h4>
+                            </div>
+                        </div>
+                        <div class="card-description">
+                            Quick setup guide to get Twick running on your local machine in minutes.
+                            <br><br>
+                            <a href="pages/getting-started.html" class="btn btn-primary">Start Here</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="bi bi-star"></i>
+                            </div>
+                            <div>
+                                <h4 class="card-title">Features</h4>
+                            </div>
+                        </div>
+                        <div class="card-description">
+                            Comprehensive overview of all Twick features and capabilities.
+                            <br><br>
+                            <a href="pages/features.html" class="btn btn-outline-primary">Explore Features</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="bi bi-diagram-3"></i>
+                            </div>
+                            <div>
+                                <h4 class="card-title">Architecture</h4>
+                            </div>
+                        </div>
+                        <div class="card-description">
+                            Deep dive into the system architecture and design patterns.
+                            <br><br>
+                            <a href="pages/architecture.html" class="btn btn-outline-primary">View Architecture</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="bi bi-code-square"></i>
+                            </div>
+                            <div>
+                                <h4 class="card-title">API Reference</h4>
+                            </div>
+                        </div>
+                        <div class="card-description">
+                            Complete API documentation with endpoints, parameters, and examples.
+                            <br><br>
+                            <a href="pages/api-reference.html" class="btn btn-outline-primary">API Docs</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="bi bi-boxes"></i>
+                            </div>
+                            <div>
+                                <h4 class="card-title">Containerization</h4>
+                            </div>
+                        </div>
+                        <div class="card-description">
+                            Complete Docker setup and containerization guide for development and production.
+                            <br><br>
+                            <a href="pages/containerization.html" class="btn btn-outline-primary">Docker Guide</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="bi bi-tools"></i>
+                            </div>
+                            <div>
+                                <h4 class="card-title">Troubleshooting</h4>
+                            </div>
+                        </div>
+                        <div class="card-description">
+                            Common issues and their solutions to help you resolve problems quickly.
+                            <br><br>
+                            <a href="pages/troubleshooting.html" class="btn btn-outline-primary">Get Help</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="bi bi-people"></i>
+                            </div>
+                            <div>
+                                <h4 class="card-title">Contributing</h4>
+                            </div>
+                        </div>
+                        <div class="card-description">
+                            Join our community and help make Twick better for everyone.
+                            <br><br>
+                            <a href="pages/contributing.html" class="btn btn-outline-primary">Contribute</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <div class="card-icon">
+                                <i class="bi bi-clock-history"></i>
+                            </div>
+                            <div>
+                                <h4 class="card-title">Changelog</h4>
+                            </div>
+                        </div>
+                        <div class="card-description">
+                            Track all notable changes and version history of the Twick project.
+                            <br><br>
+                            <a href="pages/changelog.html" class="btn btn-outline-primary">View Changes</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Documentation</h4>
+                    <a href="pages/getting-started.html">Getting Started</a>
+                    <a href="pages/architecture.html">Architecture</a>
+                    <a href="pages/api-reference.html">API Reference</a>
+                    <a href="pages/containerization.html">Containerization</a>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Features</h4>
+                    <a href="pages/features.html#tweets">Tweet Management</a>
+                    <a href="pages/features.html#social">Social Features</a>
+                    <a href="pages/features.html#messaging">Direct Messaging</a>
+                    <a href="pages/features.html#admin">Admin Interface</a>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <a href="pages/examples.html">Examples</a>
+                    <a href="pages/troubleshooting.html">Troubleshooting</a>
+                    <a href="pages/contributing.html">Contributing</a>
+                    <a href="pages/changelog.html">Changelog</a>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <a href="https://www.linkedin.com/in/karan-patel-16700a215/" target="_blank" rel="noopener">LinkedIn</a>
+                    <a href="https://discord.gg/twick" target="_blank" rel="noopener">Discord</a>
+                    <a href="https://twitter.com/twick" target="_blank" rel="noopener">Twitter</a>
+                    <a href="mailto:support@twick.dev">Support</a>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 Twick Documentation. Built with ❤️ for the Django community.</p>
+                <p>Last updated: <span id="lastUpdated">August 2025</span></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script src="assets/js/main.js"></script>
+</body>
+</html>

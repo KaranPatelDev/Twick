@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: twick_django
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount media directory for persistent file uploads
+      - ./media:/app/media
+      # Mount static files (optional for development)
+      - ./staticfiles:/app/staticfiles
+      # Mount database for persistence
+      - ./db.sqlite3:/app/db.sqlite3
+    environment:
+      - DJANGO_SETTINGS_MODULE=twick.settings
+      - DEBUG=1
+    restart: unless-stopped
+    
+  # Optional: Add PostgreSQL for production
+  # db:
+  #   image: postgres:15
+  #   container_name: twick_postgres
+  #   environment:
+  #     POSTGRES_DB: twick
+  #     POSTGRES_USER: twick_user
+  #     POSTGRES_PASSWORD: your_secure_password
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   ports:
+  #     - "5432:5432"
+  #   restart: unless-stopped
+
+  # Optional: Add Redis for caching/sessions
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: twick_redis
+  #   ports:
+  #     - "6379:6379"
+  #   restart: unless-stopped
+
+# volumes:
+#   postgres_data:

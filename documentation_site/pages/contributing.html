@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contributing - Twick Documentation</title>
+    <meta name="description" content="Contributing guidelines for Twick Django Twitter clone project">
+    
+    <!-- Stylesheets -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link href="../assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">
+                Twick Docs
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="getting-started.html">Getting Started</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="architecture.html">Architecture</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="api-reference.html">API</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="contributing.html">Contributing</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <div class="page-header">
+                <h1><i class="bi bi-people"></i> Contributing to Twick</h1>
+                <p class="lead">Help make Twick better! We welcome contributions from developers of all skill levels.</p>
+            </div>
+
+            <!-- Ways to Contribute -->
+            <section class="mb-5">
+                <h2><i class="bi bi-heart"></i> Ways to Contribute</h2>
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="contribution-card">
+                            <div class="contribution-icon">
+                                <i class="bi bi-bug"></i>
+                            </div>
+                            <h4>Report Bugs</h4>
+                            <p>Found a bug? Help us fix it by creating a detailed bug report with steps to reproduce the issue.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="contribution-card">
+                            <div class="contribution-icon">
+                                <i class="bi bi-lightbulb"></i>
+                            </div>
+                            <h4>Suggest Features</h4>
+                            <p>Have an idea for a new feature? We'd love to hear it! Submit a feature request with detailed specifications.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="contribution-card">
+                            <div class="contribution-icon">
+                                <i class="bi bi-code-slash"></i>
+                            </div>
+                            <h4>Submit Code</h4>
+                            <p>Contribute code improvements, bug fixes, or new features. All pull requests are welcome!</p>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="contribution-card">
+                            <div class="contribution-icon">
+                                <i class="bi bi-file-text"></i>
+                            </div>
+                            <h4>Improve Documentation</h4>
+                            <p>Help improve our documentation by fixing typos, adding examples, or writing new guides.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Getting Started -->
+            <section class="mb-5">
+                <h2><i class="bi bi-play-circle"></i> Getting Started</h2>
+                
+                <div class="step-container">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Fork the Repository</h4>
+                            <p>Start by forking the Twick repository to your GitHub account:</p>
+                            <pre><code class="language-bash"># Clone your fork
+git clone https://github.com/YOUR_USERNAME/twick.git
+cd twick
+
+# Add upstream remote
+git remote add upstream https://github.com/original-username/twick.git</code></pre>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Set Up Development Environment</h4>
+                            <p>Follow our development setup guide:</p>
+                            <pre><code class="language-bash"># Create virtual environment
+python -m venv venv
+source venv/bin/activate  # Linux/macOS
+venv\Scripts\activate     # Windows
+
+# Install dependencies
+pip install -r requirements.txt
+pip install -r requirements-dev.txt
+
+# Set up pre-commit hooks
+pre-commit install</code></pre>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Create a Branch</h4>
+                            <p>Create a new branch for your feature or bug fix:</p>
+                            <pre><code class="language-bash"># Create and switch to new branch
+git checkout -b feature/your-feature-name
+# or
+git checkout -b bugfix/issue-number-description</code></pre>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Make Your Changes</h4>
+                            <p>Implement your feature or bug fix following our coding standards.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <h4>Test Your Changes</h4>
+                            <pre><code class="language-bash"># Run tests
+python manage.py test
+
+# Run code quality checks
+flake8 .
+black . --check
+isort . --check-only</code></pre>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">6</div>
+                        <div class="step-content">
+                            <h4>Submit Pull Request</h4>
+                            <p>Push your changes and create a pull request with a clear description.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Development Guidelines -->
+            <section class="mb-5">
+                <h2><i class="bi bi-code-square"></i> Development Guidelines</h2>
+                
+                <div class="row g-4">
+                    <div class="col-lg-6">
+                        <h3>Code Style</h3>
+                        <div class="guideline-card">
+                            <h5><i class="bi bi-check-circle text-success"></i> Python Code</h5>
+                            <ul>
+                                <li>Follow PEP 8 style guidelines</li>
+                                <li>Use Black for code formatting</li>
+                                <li>Use isort for import sorting</li>
+                                <li>Maximum line length: 88 characters</li>
+                                <li>Use type hints when possible</li>
+                            </ul>
+                            
+                            <h5><i class="bi bi-check-circle text-success"></i> Django Conventions</h5>
+                            <ul>
+                                <li>Follow Django naming conventions</li>
+                                <li>Use Django's built-in features when available</li>
+                                <li>Write proper model relationships</li>
+                                <li>Use Django forms for data validation</li>
+                                <li>Follow DRY (Don't Repeat Yourself) principles</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-6">
+                        <h3>Frontend Guidelines</h3>
+                        <div class="guideline-card">
+                            <h5><i class="bi bi-check-circle text-primary"></i> HTML/CSS</h5>
+                            <ul>
+                                <li>Use semantic HTML elements</li>
+                                <li>Follow Bootstrap conventions</li>
+                                <li>Make responsive designs</li>
+                                <li>Use ARIA labels for accessibility</li>
+                                <li>Optimize for mobile-first</li>
+                            </ul>
+                            
+                            <h5><i class="bi bi-check-circle text-primary"></i> JavaScript</h5>
+                            <ul>
+                                <li>Use modern ES6+ syntax</li>
+                                <li>Follow consistent naming conventions</li>
+                                <li>Add proper error handling</li>
+                                <li>Write modular, reusable code</li>
+                                <li>Document complex functions</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Testing Guidelines -->
+            <section class="mb-5">
+                <h2><i class="bi bi-check2-square"></i> Testing Guidelines</h2>
+                
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="testing-card">
+                            <h4><i class="bi bi-flask text-info"></i> Unit Tests</h4>
+                            <p>Write unit tests for all new functionality:</p>
+                            <pre><code class="language-python"># Example test
+from django.test import TestCase
+from django.contrib.auth.models import User
+from tweet.models import Tweet
+
+class TweetModelTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='testuser',
+            password='testpass123'
+        )
+    
+    def test_tweet_creation(self):
+        tweet = Tweet.objects.create(
+            user=self.user,
+            content='Test tweet'
+        )
+        self.assertEqual(tweet.content, 'Test tweet')
+        self.assertEqual(tweet.user, self.user)</code></pre>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="testing-card">
+                            <h4><i class="bi bi-globe text-success"></i> Integration Tests</h4>
+                            <p>Test API endpoints and user flows:</p>
+                            <pre><code class="language-python"># Example API test
+from rest_framework.test import APITestCase
+from django.urls import reverse
+from rest_framework import status
+
+class TweetAPITest(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='testuser',
+            password='testpass123'
+        )
+        self.client.force_authenticate(user=self.user)
+    
+    def test_create_tweet(self):
+        url = reverse('tweet-list')
+        data = {'content': 'Test tweet'}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)</code></pre>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info">
+                    <h5><i class="bi bi-info-circle"></i> Test Coverage</h5>
+                    <p>We aim for at least 80% test coverage. Run coverage reports with:</p>
+                    <pre><code class="language-bash">coverage run --source='.' manage.py test
+coverage report
+coverage html  # Generate HTML report</code></pre>
+                </div>
+            </section>
+
+            <!-- Commit Guidelines -->
+            <section class="mb-5">
+                <h2><i class="bi bi-git"></i> Commit Guidelines</h2>
+                
+                <p>We follow conventional commit format for clear and consistent commit messages:</p>
+                
+                <div class="commit-format">
+                    <h4>Commit Format</h4>
+                    <pre><code class="language-text">type(scope): description
+
+[optional body]
+
+[optional footer(s)]</code></pre>
+                </div>
+                
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <h5>Commit Types</h5>
+                        <ul class="commit-types">
+                            <li><strong>feat:</strong> New feature</li>
+                            <li><strong>fix:</strong> Bug fix</li>
+                            <li><strong>docs:</strong> Documentation changes</li>
+                            <li><strong>style:</strong> Code style changes</li>
+                            <li><strong>refactor:</strong> Code refactoring</li>
+                            <li><strong>test:</strong> Adding tests</li>
+                            <li><strong>chore:</strong> Maintenance tasks</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h5>Examples</h5>
+                        <pre><code class="language-text">feat(auth): add social login with Google
+
+fix(tweet): resolve character limit validation
+
+docs(api): update authentication documentation
+
+style(frontend): format CSS files with prettier
+
+test(models): add tests for Tweet model</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Pull Request Guidelines -->
+            <section class="mb-5">
+                <h2><i class="bi bi-git"></i> Pull Request Guidelines</h2>
+                
+                <div class="pr-checklist">
+                    <h4><i class="bi bi-check2-all"></i> Before Submitting</h4>
+                    <div class="checklist">
+                        <div class="checklist-item">
+                            <input type="checkbox" id="pr-1" disabled>
+                            <label for="pr-1">Code follows project style guidelines</label>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="pr-2" disabled>
+                            <label for="pr-2">All tests pass locally</label>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="pr-3" disabled>
+                            <label for="pr-3">New functionality includes tests</label>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="pr-4" disabled>
+                            <label for="pr-4">Documentation updated if needed</label>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="pr-5" disabled>
+                            <label for="pr-5">Commit messages follow conventions</label>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="pr-6" disabled>
+                            <label for="pr-6">PR description clearly explains changes</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="pr-template">
+                    <h4>PR Template</h4>
+                    <pre><code class="language-markdown">## Description
+Brief description of the changes made.
+
+## Type of Change
+- [ ] Bug fix (non-breaking change that fixes an issue)
+- [ ] New feature (non-breaking change that adds functionality)
+- [ ] Breaking change (fix or feature that causes existing functionality to not work as expected)
+- [ ] Documentation update
+
+## Testing
+- [ ] Unit tests pass
+- [ ] Integration tests pass
+- [ ] Manual testing completed
+
+## Screenshots (if applicable)
+Add screenshots to help explain your changes.
+
+## Related Issues
+Fixes #123
+Closes #456</code></pre>
+                </div>
+            </section>
+
+            <!-- Development Tools -->
+            <section class="mb-5">
+                <h2><i class="bi bi-tools"></i> Development Tools</h2>
+                
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="tool-card">
+                            <h4><i class="bi bi-code text-primary"></i> Code Quality</h4>
+                            <ul>
+                                <li><strong>Black:</strong> Code formatting</li>
+                                <li><strong>isort:</strong> Import sorting</li>
+                                <li><strong>flake8:</strong> Linting</li>
+                                <li><strong>mypy:</strong> Type checking</li>
+                                <li><strong>pre-commit:</strong> Git hooks</li>
+                            </ul>
+                            <pre><code class="language-bash"># Install dev tools
+pip install -r requirements-dev.txt
+
+# Run code formatting
+black .
+isort .
+
+# Run linting
+flake8 .</code></pre>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="tool-card">
+                            <h4><i class="bi bi-bug text-danger"></i> Testing & Debugging</h4>
+                            <ul>
+                                <li><strong>pytest:</strong> Test framework</li>
+                                <li><strong>coverage:</strong> Test coverage</li>
+                                <li><strong>django-debug-toolbar:</strong> Debug info</li>
+                                <li><strong>factory-boy:</strong> Test data generation</li>
+                            </ul>
+                            <pre><code class="language-bash"># Run tests with coverage
+coverage run --source='.' manage.py test
+coverage report
+
+# Debug with toolbar
+DEBUG=True python manage.py runserver</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Issue Reporting -->
+            <section class="mb-5">
+                <h2><i class="bi bi-bug"></i> Reporting Issues</h2>
+                
+                <div class="issue-template">
+                    <h4>Bug Report Template</h4>
+                    <pre><code class="language-markdown">## Bug Description
+A clear and concise description of what the bug is.
+
+## Steps to Reproduce
+1. Go to '...'
+2. Click on '....'
+3. Scroll down to '....'
+4. See error
+
+## Expected Behavior
+A clear description of what you expected to happen.
+
+## Actual Behavior
+A clear description of what actually happened.
+
+## Environment
+- OS: [e.g. iOS]
+- Browser: [e.g. chrome, safari]
+- Version: [e.g. 22]
+- Python version:
+- Django version:
+
+## Additional Context
+Add any other context about the problem here.</code></pre>
+                </div>
+                
+                <div class="feature-template">
+                    <h4>Feature Request Template</h4>
+                    <pre><code class="language-markdown">## Feature Description
+A clear and concise description of what you want to happen.
+
+## Use Case
+Describe the use case or problem this feature would solve.
+
+## Proposed Solution
+Describe the solution you'd like to see implemented.
+
+## Alternative Solutions
+Describe any alternative solutions you've considered.
+
+## Additional Context
+Add any other context or screenshots about the feature request here.</code></pre>
+                </div>
+            </section>
+
+            <!-- Community Guidelines -->
+            <section class="mb-5">
+                <h2><i class="bi bi-people"></i> Community Guidelines</h2>
+                
+                <div class="community-guidelines">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="guideline-card">
+                                <h4><i class="bi bi-heart text-danger"></i> Be Respectful</h4>
+                                <ul>
+                                    <li>Treat everyone with respect and kindness</li>
+                                    <li>Be constructive in your feedback</li>
+                                    <li>Welcome newcomers and help them learn</li>
+                                    <li>Be patient with different skill levels</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="guideline-card">
+                                <h4><i class="bi bi-chat-text text-primary"></i> Communication</h4>
+                                <ul>
+                                    <li>Use clear and descriptive language</li>
+                                    <li>Provide context and examples</li>
+                                    <li>Ask questions when unsure</li>
+                                    <li>Share knowledge and resources</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recognition -->
+            <section class="mb-5">
+                <h2><i class="bi bi-award"></i> Recognition</h2>
+                <div class="alert alert-success">
+                    <h5><i class="bi bi-star"></i> Contributors Hall of Fame</h5>
+                    <p>We recognize and appreciate all contributors to the Twick project. Contributors are listed in our README.md file and receive special recognition in our community Discord server.</p>
+                    <p>Major contributors may be invited to join our core team and help guide the project's future direction.</p>
+                </div>
+            </section>
+
+            <!-- Navigation -->
+            <nav class="page-nav">
+                <a href="troubleshooting.html" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left"></i> Troubleshooting
+                </a>
+                <a href="https://www.linkedin.com/in/karan-patel-16700a215/" class="btn btn-primary" target="_blank" rel="noopener">
+                    Connect on LinkedIn <i class="bi bi-linkedin"></i>
+                </a>
+            </nav>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <p>&copy; 2024 Twick Documentation. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <a href="https://www.linkedin.com/in/karan-patel-16700a215/" target="_blank" rel="noopener">
+                        <i class="bi bi-linkedin"></i> LinkedIn
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script src="../assets/js/script.js"></script>
+</body>
+</html>

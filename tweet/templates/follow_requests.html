@@ -1,0 +1,70 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block title %}Follow Requests{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <h2><i class="fas fa-user-clock me-2"></i>Follow Requests</h2>
+            <p class="text-muted mb-4">People who want to follow you</p>
+            
+            {% for request in pending_requests %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center">
+                                {% if request.from_user.userprofile.avatar %}
+                                    <img src="{{ request.from_user.userprofile.avatar.url }}" alt="{{ request.from_user.username }}" class="rounded-circle me-3" width="50" height="50">
+                                {% else %}
+                                    <div class="bg-secondary rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                        <i class="fas fa-user text-white"></i>
+                                    </div>
+                                {% endif %}
+                                <div>
+                                    <strong>
+                                        <a href="{% url 'user_profile' request.from_user.username %}" class="text-decoration-none">
+                                            {{ request.from_user.get_full_name|default:request.from_user.username }}
+                                        </a>
+                                    </strong>
+                                    <div class="text-muted">@{{ request.from_user.username }}</div>
+                                    {% if request.from_user.userprofile.bio %}
+                                        <small class="text-muted">{{ request.from_user.userprofile.bio|truncatechars:100 }}</small>
+                                    {% endif %}
+                                    <div class="text-muted">
+                                        <small>Requested {{ request.created_at|timesince }} ago</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex gap-2">
+                                <form method="post" action="{% url 'handle_follow_request' request.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="accept">
+                                    <button type="submit" class="btn btn-success btn-sm">
+                                        <i class="fas fa-check"></i> Accept
+                                    </button>
+                                </form>
+                                <form method="post" action="{% url 'handle_follow_request' request.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="reject">
+                                    <button type="submit" class="btn btn-outline-secondary btn-sm">
+                                        <i class="fas fa-times"></i> Decline
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="text-center py-5">
+                    <i class="fas fa-user-check fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No pending follow requests</h5>
+                    <p class="text-muted">When someone requests to follow your private account, you'll see them here.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

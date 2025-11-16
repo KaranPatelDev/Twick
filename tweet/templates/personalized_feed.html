@@ -1,0 +1,258 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block title %}Your Feed{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-home me-2"></i>Your Feed</h2>
+                <a href="{% url 'tweet_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> New Tweet
+                </a>
+            </div>
+            
+            <!-- Feed Navigation -->
+            <ul class="nav nav-tabs mb-4">
+                <li class="nav-item">
+                    <a class="nav-link active" href="{% url 'personalized_feed' %}">Following</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'home' %}">Discover</a>
+                </li>
+            </ul>
+            
+            {% for tweet in tweets %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <!-- Tweet Header -->
+                        <div class="d-flex align-items-center mb-3">
+                            {% if tweet.user.userprofile.avatar %}
+                                <img src="{{ tweet.user.userprofile.avatar.url }}" alt="{{ tweet.user.username }}" class="rounded-circle me-3" width="50" height="50">
+                            {% else %}
+                                <div class="bg-secondary rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                    <i class="fas fa-user text-white"></i>
+                                </div>
+                            {% endif %}
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center">
+                                    <strong>
+                                        <a href="{% url 'user_profile' tweet.user.username %}" class="text-decoration-none">
+                                            {{ tweet.user.get_full_name|default:tweet.user.username }}
+                                        </a>
+                                    </strong>
+                                    {% if tweet.user.userprofile.is_verified %}
+                                        <i class="fas fa-check-circle text-primary ms-1" title="Verified"></i>
+                                    {% endif %}
+                                    <span class="text-muted ms-2">@{{ tweet.user.username }}</span>
+                                    <span class="text-muted ms-2">•</span>
+                                    <span class="text-muted ms-2">{{ tweet.created_at|timesince }} ago</span>
+                                </div>
+                                {% if tweet.privacy == 'private' %}
+                                    <small class="text-muted">
+                                        <i class="fas fa-lock"></i> Private
+                                    </small>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Tweet Actions Dropdown -->
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-ellipsis-h"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    {% if tweet.user == request.user %}
+                                        <li><a class="dropdown-item" href="{% url 'tweet_edit' tweet.id %}">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a></li>
+                                        <li><a class="dropdown-item text-danger" href="{% url 'tweet_delete' tweet.id %}">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </a></li>
+                                    {% else %}
+                                        <li><a class="dropdown-item" href="#" onclick="muteUser('{{ tweet.user.username }}')">
+                                            <i class="fas fa-volume-mute"></i> Mute @{{ tweet.user.username }}
+                                        </a></li>
+                                        <li><a class="dropdown-item text-danger" href="#" onclick="blockUser('{{ tweet.user.username }}')">
+                                            <i class="fas fa-ban"></i> Block @{{ tweet.user.username }}
+                                        </a></li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <!-- Tweet Content -->
+                        <div class="mb-3">
+                            <p class="mb-2">{{ tweet.text|linebreaksbr }}</p>
+                            
+                            {% if tweet.image %}
+                                <div class="mb-3">
+                                    <img src="{{ tweet.image.url }}" alt="Tweet image" class="img-fluid rounded">
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Hashtags -->
+                            {% for hashtag_relation in tweet.hashtag_relations.all %}
+                                <a href="{% url 'hashtag_detail' hashtag_relation.hashtag.name %}" class="badge bg-primary text-decoration-none me-1">
+                                    #{{ hashtag_relation.hashtag.name }}
+                                </a>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Tweet Stats and Actions -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex gap-4">
+                                <!-- Like Button -->
+                                <button class="btn btn-sm btn-outline-danger" onclick="likeTweet({{ tweet.id }}, this)" 
+                                        data-liked="{% if request.user in tweet.likes.all %}true{% else %}false{% endif %}">
+                                    <i class="fa{% if request.user in tweet.likes.all %}s{% else %}r{% endif %} fa-heart"></i>
+                                    <span class="like-count">{{ tweet.get_likes_count }}</span>
+                                </button>
+                                
+                                <!-- Reply Button -->
+                                <a href="{% url 'tweet_reply' tweet.id %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-reply"></i>
+                                    <span>{{ tweet.get_replies_count }}</span>
+                                </a>
+                                
+                                <!-- Share Button -->
+                                <button class="btn btn-sm btn-outline-success" onclick="shareTweet({{ tweet.id }})">
+                                    <i class="fas fa-share"></i>
+                                </button>
+                            </div>
+                            
+                            <small class="text-muted">
+                                <a href="{% url 'tweet_detail' tweet.id %}" class="text-decoration-none">
+                                    View details
+                                </a>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="text-center py-5">
+                    <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Your feed is empty</h5>
+                    <p class="text-muted">Follow some users to see their tweets in your feed!</p>
+                    <div class="mt-3">
+                        <a href="{% url 'search' %}" class="btn btn-primary me-2">
+                            <i class="fas fa-search"></i> Find People
+                        </a>
+                        <a href="{% url 'home' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-globe"></i> Explore Public Tweets
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-md-4">
+            <!-- Trending Section -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h6 class="mb-0">Trending</h6>
+                </div>
+                <div class="card-body">
+                    <a href="{% url 'trending_hashtags' %}" class="btn btn-outline-primary btn-sm w-100">
+                        <i class="fas fa-fire"></i> View All Trends
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">Quick Actions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'notifications_list' %}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-bell"></i> Notifications
+                            {% comment %}<span class="badge bg-danger ms-1" id="notificationCount"></span>{% endcomment %}
+                        </a>
+                        <a href="{% url 'conversations_list' %}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-envelope"></i> Messages
+                        </a>
+                        <a href="{% url 'search' %}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-search"></i> Search
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function likeTweet(tweetId, button) {
+    fetch(`/tweet/${tweetId}/like/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        const icon = button.querySelector('i');
+        const countSpan = button.querySelector('.like-count');
+        
+        if (data.liked) {
+            icon.classList.remove('far');
+            icon.classList.add('fas');
+            button.setAttribute('data-liked', 'true');
+        } else {
+            icon.classList.remove('fas');
+            icon.classList.add('far');
+            button.setAttribute('data-liked', 'false');
+        }
+        countSpan.textContent = data.likes_count;
+    });
+}
+
+function muteUser(username) {
+    if (confirm(`Are you sure you want to mute @${username}?`)) {
+        fetch(`/api/mute/${username}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+    }
+}
+
+function blockUser(username) {
+    if (confirm(`Are you sure you want to block @${username}? This will also unfollow them.`)) {
+        fetch(`/api/block/${username}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+    }
+}
+
+function shareTweet(tweetId) {
+    const url = `${window.location.origin}/tweet/${tweetId}/`;
+    navigator.clipboard.writeText(url).then(() => {
+        alert('Tweet link copied to clipboard!');
+    });
+}
+</script>
+{% endblock %}

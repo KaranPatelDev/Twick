@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deployment Guide - Twick Documentation</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>🚀 Deployment Guide</h1>
+            <p>Complete guide to deploying Twick in production environments</p>
+        </div>
+    </header>
+
+    <nav class="nav">
+        <div class="nav-container">
+            <ul>
+                <li><a href="../home.html">Overview</a></li>
+                <li><a href="system-architecture.html">Architecture</a></li>
+                <li><a href="deployment-guide.html" class="active">Deployment</a></li>
+                <li><a href="api-reference.html">API Reference</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="content-grid">
+            <aside class="sidebar">
+                <h3>Deployment Topics</h3>
+                <ul>
+                    <li><a href="#overview">Deployment Overview</a></li>
+                    <li><a href="#docker-production">Docker Production</a></li>
+                    <li><a href="#cloud-deployment">Cloud Deployment</a></li>
+                    <li><a href="#vps-deployment">VPS Deployment</a></li>
+                    <li><a href="#environment-setup">Environment Setup</a></li>
+                    <li><a href="#ssl-https">SSL & HTTPS</a></li>
+                    <li><a href="#monitoring">Monitoring</a></li>
+                    <li><a href="#backup-strategy">Backup Strategy</a></li>
+                    <li><a href="#scaling">Scaling</a></li>
+                </ul>
+            </aside>
+
+            <main class="main-content">
+                <section id="overview">
+                    <h1>🚀 Deployment Guide</h1>
+                    
+                    <div class="alert alert-info">
+                        <strong>Production Ready:</strong> This guide covers multiple deployment strategies for Twick, from simple VPS setups to scalable cloud deployments.
+                    </div>
+
+                    <h2>Deployment Options</h2>
+                    
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">🐳</div>
+                            <h3>Docker Deployment</h3>
+                            <p>Containerized deployment with Docker Compose for easy scaling and management</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="feature-icon">☁️</div>
+                            <h3>Cloud Platforms</h3>
+                            <p>Deploy to AWS, Google Cloud, Azure, or DigitalOcean with automated CI/CD</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="feature-icon">🖥️</div>
+                            <h3>VPS Deployment</h3>
+                            <p>Traditional server deployment with nginx, systemd, and SSL configuration</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="feature-icon">📊</div>
+                            <h3>Monitoring & Logs</h3>
+                            <p>Comprehensive monitoring setup with logging, metrics, and alerting</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="docker-production">
+                    <h2>🐳 Docker Production Deployment</h2>
+                    
+                    <p>Twick includes production-ready Docker configurations for easy deployment:</p>
+
+                    <h3>Production Docker Setup</h3>
+                    <div class="card">
+                        <h4>1. Clone and Configure</h4>
+                        <pre><code class="language-bash">git clone https://github.com/yourusername/twick.git
+cd twick
+
+# Create production environment file
+cat > .env.prod << EOF
+DEBUG=False
+SECRET_KEY=your-very-secure-secret-key-here
+DATABASE_URL=postgresql://username:password@db:5432/twick_prod
+ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com
+POSTGRES_DB=twick_prod
+POSTGRES_USER=username
+POSTGRES_PASSWORD=secure_password
+EOF</code></pre>
+
+                        <h4>2. Build and Deploy</h4>
+                        <pre><code class="language-bash"># Build production containers
+docker-compose -f docker-compose.prod.yml build
+
+# Deploy with database
+docker-compose -f docker-compose.prod.yml up -d
+
+# Run migrations
+docker-compose -f docker-compose.prod.yml exec web python manage.py migrate
+
+# Create superuser
+docker-compose -f docker-compose.prod.yml exec web python manage.py createsuperuser
+
+# Collect static files
+docker-compose -f docker-compose.prod.yml exec web python manage.py collectstatic --noinput</code></pre>
+                    </div>
+
+                    <h3>Production Nginx Configuration</h3>
+                    <div class="card">
+                        <pre><code class="language-nginx"># nginx/nginx.conf
+upstream django {
+    server web:8000;
+}
+
+server {
+    listen 80;
+    server_name yourdomain.com www.yourdomain.com;
+    
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+    
+    location / {
+        return 301 https://$server_name$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl http2;
+    server_name yourdomain.com www.yourdomain.com;
+    
+    ssl_certificate /etc/letsencrypt/live/yourdomain.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/yourdomain.com/privkey.pem;
+    
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers ECDHE-RSA-AES256-GCM-SHA512:DHE-RSA-AES256-GCM-SHA512:ECDHE-RSA-AES256-GCM-SHA384;
+    ssl_prefer_server_ciphers off;
+    
+    client_max_body_size 100M;
+    
+    location / {
+        proxy_pass http://django;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $host;
+        proxy_redirect off;
+    }
+    
+    location /static/ {
+        alias /app/staticfiles/;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+    
+    location /media/ {
+        alias /app/media/;
+        expires 1y;
+        add_header Cache-Control "public";
+    }
+}</code></pre>
+                    </div>
+                </section>
+
+                <section id="cloud-deployment">
+                    <h2>☁️ Cloud Platform Deployment</h2>
+
+                    <h3>AWS Deployment with ECS</h3>
+                    <div class="card">
+                        <h4>1. Setup AWS CLI and ECR</h4>
+                        <pre><code class="language-bash"># Install AWS CLI
+pip install awscli
+
+# Configure AWS credentials
+aws configure
+
+# Create ECR repository
+aws ecr create-repository --repository-name twick
+
+# Get login token
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 123456789012.dkr.ecr.us-east-1.amazonaws.com</code></pre>
+
+                        <h4>2. Build and Push Docker Image</h4>
+                        <pre><code class="language-bash"># Build production image
+docker build -f Dockerfile.prod -t twick .
+
+# Tag for ECR
+docker tag twick:latest 123456789012.dkr.ecr.us-east-1.amazonaws.com/twick:latest
+
+# Push to ECR
+docker push 123456789012.dkr.ecr.us-east-1.amazonaws.com/twick:latest</code></pre>
+                    </div>
+
+                    <h3>DigitalOcean App Platform</h3>
+                    <div class="card">
+                        <h4>App Spec Configuration</h4>
+                        <pre><code class="language-yaml"># .do/app.yaml
+name: twick
+services:
+- name: web
+  source_dir: /
+  github:
+    repo: yourusername/twick
+    branch: main
+  run_command: gunicorn --worker-tmp-dir /dev/shm twick.wsgi:application
+  environment_slug: python
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  envs:
+  - key: DEBUG
+    value: "False"
+  - key: ALLOWED_HOSTS
+    value: "twick-app.ondigitalocean.app"
+  - key: SECRET_KEY
+    value: "${SECRET_KEY}"
+    type: SECRET
+  - key: DATABASE_URL
+    value: "${DATABASE_URL}"
+    type: SECRET
+
+databases:
+- name: twick-db
+  engine: PG
+  version: "13"
+  size: basic-xxs
+
+static_sites:
+- name: static
+  source_dir: /staticfiles
+  routes:
+  - path: /static</code></pre>
+
+                        <h4>Deploy to DigitalOcean</h4>
+                        <pre><code class="language-bash"># Install doctl
+snap install doctl
+
+# Authenticate
+doctl auth init
+
+# Create app
+doctl apps create .do/app.yaml
+
+# Get app info
+doctl apps list</code></pre>
+                    </div>
+
+                    <h3>Heroku Deployment</h3>
+                    <div class="card">
+                        <h4>1. Heroku Configuration</h4>
+                        <pre><code class="language-bash"># Install Heroku CLI
+# Create Procfile
+echo "web: gunicorn twick.wsgi:application --log-file -" > Procfile
+
+# Create runtime.txt
+echo "python-3.12.0" > runtime.txt
+
+# Login to Heroku
+heroku login
+
+# Create app
+heroku create your-twick-app
+
+# Add PostgreSQL addon
+heroku addons:create heroku-postgresql:mini
+
+# Set environment variables
+heroku config:set DEBUG=False
+heroku config:set SECRET_KEY=your-secret-key
+heroku config:set ALLOWED_HOSTS=your-twick-app.herokuapp.com
+
+# Deploy
+git push heroku main
+
+# Run migrations
+heroku run python manage.py migrate
+
+# Create superuser
+heroku run python manage.py createsuperuser</code></pre>
+                    </div>
+                </section>
+
+                <section id="vps-deployment">
+                    <h2>🖥️ VPS Deployment</h2>
+
+                    <p>Deploy Twick on a traditional VPS using nginx, systemd, and PostgreSQL:</p>
+
+                    <h3>Server Setup (Ubuntu 22.04)</h3>
+                    <div class="card">
+                        <h4>1. Initial Server Configuration</h4>
+                        <pre><code class="language-bash"># Update system
+sudo apt update && sudo apt upgrade -y
+
+# Install dependencies
+sudo apt install -y python3 python3-pip python3-venv nginx postgresql postgresql-contrib supervisor git
+
+# Create user for application
+sudo adduser twick
+sudo usermod -aG sudo twick
+
+# Switch to application user
+sudo su - twick</code></pre>
+
+                        <h4>2. Application Setup</h4>
+                        <pre><code class="language-bash"># Clone repository
+git clone https://github.com/yourusername/twick.git
+cd twick
+
+# Create virtual environment
+python3 -m venv venv
+source venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+pip install psycopg2-binary
+
+# Create environment file
+cat > .env << EOF
+DEBUG=False
+SECRET_KEY=your-production-secret-key
+DATABASE_URL=postgresql://twick_user:password@localhost:5432/twick_db
+ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com
+STATIC_ROOT=/home/twick/twick/staticfiles/
+MEDIA_ROOT=/home/twick/twick/media/
+EOF</code></pre>
+                    </div>
+
+                    <h3>Database Configuration</h3>
+                    <div class="card">
+                        <pre><code class="language-bash"># Switch to postgres user
+sudo su - postgres
+
+# Create database and user
+createdb twick_db
+createuser twick_user
+
+# Set password and permissions
+psql
+ALTER USER twick_user WITH PASSWORD 'secure_password';
+GRANT ALL PRIVILEGES ON DATABASE twick_db TO twick_user;
+\q
+
+# Exit postgres user
+exit
+
+# Run migrations as twick user
+sudo su - twick
+cd twick
+source venv/bin/activate
+python manage.py migrate
+python manage.py collectstatic --noinput
+python manage.py createsuperuser</code></pre>
+                    </div>
+
+                    <h3>Systemd Service Configuration</h3>
+                    <div class="card">
+                        <pre><code class="language-ini"># /etc/systemd/system/twick.service
+[Unit]
+Description=Twick Django Application
+After=network.target postgresql.service
+Requires=postgresql.service
+
+[Service]
+Type=exec
+User=twick
+Group=twick
+WorkingDirectory=/home/twick/twick
+Environment=PATH=/home/twick/twick/venv/bin
+EnvironmentFile=/home/twick/twick/.env
+ExecStart=/home/twick/twick/venv/bin/gunicorn --workers 3 --bind 127.0.0.1:8000 twick.wsgi:application
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target</code></pre>
+
+                        <h4>Enable and Start Service</h4>
+                        <pre><code class="language-bash"># Reload systemd
+sudo systemctl daemon-reload
+
+# Enable service
+sudo systemctl enable twick
+
+# Start service
+sudo systemctl start twick
+
+# Check status
+sudo systemctl status twick</code></pre>
+                    </div>
+
+                    <h3>Nginx Configuration</h3>
+                    <div class="card">
+                        <pre><code class="language-nginx"># /etc/nginx/sites-available/twick
+server {
+    listen 80;
+    server_name yourdomain.com www.yourdomain.com;
+    
+    client_max_body_size 100M;
+    
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    
+    location /static/ {
+        alias /home/twick/twick/staticfiles/;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+    
+    location /media/ {
+        alias /home/twick/twick/media/;
+        expires 1y;
+        add_header Cache-Control "public";
+    }
+}
+
+# Enable site
+sudo ln -s /etc/nginx/sites-available/twick /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl restart nginx</code></pre>
+                    </div>
+                </section>
+
+                <section id="ssl-https">
+                    <h2>🔒 SSL & HTTPS Setup</h2>
+
+                    <h3>Let's Encrypt with Certbot</h3>
+                    <div class="card">
+                        <pre><code class="language-bash"># Install certbot
+sudo apt install certbot python3-certbot-nginx
+
+# Obtain SSL certificate
+sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
+
+# Verify auto-renewal
+sudo certbot renew --dry-run
+
+# Setup auto-renewal cron job
+sudo crontab -e
+# Add: 0 12 * * * /usr/bin/certbot renew --quiet</code></pre>
+                    </div>
+
+                    <h3>SSL Configuration for Docker</h3>
+                    <div class="card">
+                        <pre><code class="language-bash"># Initialize SSL certificates
+sudo docker-compose -f docker-compose.prod.yml run --rm certbot certbot certonly --webroot --webroot-path /var/www/certbot/ -d yourdomain.com -d www.yourdomain.com
+
+# Start services with SSL
+sudo docker-compose -f docker-compose.prod.yml up -d</code></pre>
+                    </div>
+                </section>
+
+                <section id="monitoring">
+                    <h2>📊 Monitoring & Logging</h2>
+
+                    <h3>Django Logging Configuration</h3>
+                    <div class="card">
+                        <pre><code class="language-python"># settings/production.py
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': '/var/log/twick/django.log',
+            'maxBytes': 1024*1024*5,  # 5 MB
+            'backupCount': 5,
+            'formatter': 'verbose',
+        },
+        'error_file': {
+            'level': 'ERROR',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': '/var/log/twick/django_error.log',
+            'maxBytes': 1024*1024*5,  # 5 MB
+            'backupCount': 5,
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'django.request': {
+            'handlers': ['error_file'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+    },
+}</code></pre>
+                    </div>
+
+                    <div class="alert alert-success">
+                        <strong>Production Ready!</strong> With these configurations, Twick is ready for production deployment with proper scaling, monitoring, and backup strategies.
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Twick Documentation. Built with ❤️ and Django.</p>
+        </div>
+    </footer>
+
+    <button class="back-to-top" aria-label="Back to top">↑</button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script src="../assets/js/script.js"></script>
+</body>
+</html>

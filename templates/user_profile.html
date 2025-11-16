@@ -1,0 +1,421 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block title %}{{ profile.get_display_name }} (@{{ profile_user.username }}) - Twick{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <!-- Cover Photo Section -->
+    <div class="position-relative" style="height: 300px; background: linear-gradient(135deg, {{ profile.theme_color }}20, {{ profile.theme_color }}40); overflow: hidden;">
+        {% if profile.cover_photo %}
+            <img src="{{ profile.cover_photo.url }}" alt="Cover Photo" 
+                 class="w-100 h-100" style="object-fit: cover;">
+        {% else %}
+            <div class="w-100 h-100 d-flex align-items-center justify-content-center" 
+                 style="background: linear-gradient(135deg, {{ profile.theme_color }}40, {{ profile.theme_color }}60);">
+                <i class="bi bi-image text-white" style="font-size: 4rem; opacity: 0.3;"></i>
+            </div>
+        {% endif %}
+        
+        <!-- Profile Actions Overlay -->
+        <div class="position-absolute top-0 end-0 p-3">
+            {% if user == profile_user %}
+                <a href="{% url 'edit_profile' %}" class="btn btn-dark btn-sm rounded-pill">
+                    <i class="bi bi-pencil me-1"></i>Edit Profile
+                </a>
+            {% elif user.is_authenticated %}
+                <button class="btn btn-{% if is_following %}primary{% else %}outline-light{% endif %} btn-sm rounded-pill follow-btn" 
+                        data-username="{{ profile_user.username }}">
+                    <i class="bi bi-{% if is_following %}check{% else %}plus{% endif %} me-1"></i>
+                    <span class="follow-text">{% if is_following %}Following{% else %}Follow{% endif %}</span>
+                </button>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Profile Info Section -->
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <!-- Avatar Section -->
+                <div class="d-flex align-items-end" style="margin-top: -80px; margin-bottom: 20px;">
+                    <div class="position-relative">
+                        {% if profile.avatar %}
+                            <img src="{{ profile.avatar.url }}" alt="{{ profile_user.username }}'s avatar" 
+                                 class="rounded-circle border border-4 border-white shadow-lg" 
+                                 style="width: 140px; height: 140px; object-fit: cover;">
+                        {% else %}
+                            <div class="rounded-circle border border-4 border-white shadow-lg d-flex align-items-center justify-content-center text-white" 
+                                 style="width: 140px; height: 140px; background: {{ profile.theme_color }}; font-size: 3rem; font-weight: bold;">
+                                {{ profile_user.username|first|upper }}
+                            </div>
+                        {% endif %}
+                        
+                        {% if profile.is_verified %}
+                            <div class="position-absolute bottom-0 end-0 bg-primary rounded-circle p-2">
+                                <i class="bi bi-check-lg text-white" style="font-size: 1.2rem;"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Profile Completion Badge (for profile owner) -->
+                    {% if show_completion and profile.get_profile_completion_percentage < 100 %}
+                        <div class="ms-3 alert alert-info alert-sm rounded-pill px-3 py-2">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Profile {{ profile.get_profile_completion_percentage }}% complete
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- User Info -->
+                <div class="row">
+                    <div class="col-lg-8">
+                        <!-- Name and Username -->
+                        <div class="mb-3">
+                            <h1 class="h2 mb-1 d-flex align-items-center">
+                                {{ profile.get_display_name }}
+                                {% if profile.is_verified %}
+                                    <i class="bi bi-patch-check-fill text-primary ms-2" title="Verified account"></i>
+                                {% endif %}
+                            </h1>
+                            <p class="text-muted mb-0">@{{ profile_user.username }}</p>
+                        </div>
+                        
+                        <!-- Bio -->
+                        {% if profile.bio %}
+                            <p class="mb-3">{{ profile.bio|linebreaks }}</p>
+                        {% endif %}
+                        
+                        <!-- Info Row -->
+                        <div class="d-flex flex-wrap gap-3 mb-3 text-muted">
+                            {% if profile.job_title or profile.company %}
+                                <span>
+                                    <i class="bi bi-briefcase me-1"></i>
+                                    {% if profile.job_title %}{{ profile.job_title }}{% endif %}
+                                    {% if profile.job_title and profile.company %} at {% endif %}
+                                    {% if profile.company %}{{ profile.company }}{% endif %}
+                                </span>
+                            {% endif %}
+                            
+                            {% if profile.location %}
+                                <span><i class="bi bi-geo-alt me-1"></i>{{ profile.location }}</span>
+                            {% endif %}
+                            
+                            {% if profile.website %}
+                                <span>
+                                    <i class="bi bi-link-45deg me-1"></i>
+                                    <a href="{{ profile.website }}" target="_blank" class="text-decoration-none">
+                                        {{ profile.website|slice:"8:" }}
+                                    </a>
+                                </span>
+                            {% endif %}
+                            
+                            {% if profile.birth_date and profile.show_birth_date %}
+                                <span>
+                                    <i class="bi bi-calendar me-1"></i>
+                                    {% if profile.age %}{{ profile.age }} years old{% else %}{{ profile.birth_date|date:"F j" }}{% endif %}
+                                </span>
+                            {% endif %}
+                            
+                            {% if profile_user.email and profile.show_email %}
+                                <span>
+                                    <i class="bi bi-envelope me-1"></i>
+                                    <a href="mailto:{{ profile_user.email }}" class="text-decoration-none">{{ profile_user.email }}</a>
+                                </span>
+                            {% endif %}
+                            
+                            <span><i class="bi bi-calendar3 me-1"></i>Joined {{ profile_user.date_joined|date:"F Y" }}</span>
+                        </div>
+                        
+                        <!-- Social Links -->
+                        {% if profile.twitter_handle or profile.github_username or profile.linkedin_profile %}
+                            <div class="d-flex gap-3 mb-3">
+                                {% if profile.twitter_handle %}
+                                    <a href="https://twitter.com/{{ profile.twitter_handle }}" target="_blank" 
+                                       class="btn btn-outline-secondary btn-sm">
+                                        <i class="bi bi-twitter me-1"></i>Twitter
+                                    </a>
+                                {% endif %}
+                                
+                                {% if profile.github_username %}
+                                    <a href="https://github.com/{{ profile.github_username }}" target="_blank" 
+                                       class="btn btn-outline-secondary btn-sm">
+                                        <i class="bi bi-github me-1"></i>GitHub
+                                    </a>
+                                {% endif %}
+                                
+                                {% if profile.linkedin_profile %}
+                                    <a href="{{ profile.linkedin_profile }}" target="_blank" 
+                                       class="btn btn-outline-secondary btn-sm">
+                                        <i class="bi bi-linkedin me-1"></i>LinkedIn
+                                    </a>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Stats -->
+                        <div class="d-flex gap-4 mb-4">
+                            <div>
+                                <strong>{{ profile.get_tweets_count }}</strong>
+                                <span class="text-muted">Tweet{{ profile.get_tweets_count|pluralize }}</span>
+                            </div>
+                            <div>
+                                <strong>{{ profile.get_following_count }}</strong>
+                                <span class="text-muted">Following</span>
+                            </div>
+                            <div>
+                                <strong>{{ profile.get_followers_count }}</strong>
+                                <span class="text-muted">Follower{{ profile.get_followers_count|pluralize }}</span>
+                            </div>
+                            <div>
+                                <strong>{{ total_likes }}</strong>
+                                <span class="text-muted">Like{{ total_likes|pluralize }}</span>
+                            </div>
+                            {% if total_replies > 0 %}
+                                <div>
+                                    <strong>{{ total_replies }}</strong>
+                                    <span class="text-muted">Repl{{ total_replies|pluralize:"y,ies" }}</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Mutual Followers -->
+                        {% if mutual_followers %}
+                            <div class="alert alert-light border rounded-3 p-3 mb-4">
+                                <small class="text-muted">
+                                    <i class="bi bi-people me-1"></i>
+                                    Followed by 
+                                    {% for follower in mutual_followers %}
+                                        <a href="{% url 'user_profile' follower.username %}" class="text-decoration-none">
+                                            {{ follower.get_full_name|default:follower.username }}
+                                        </a>{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                    {% if profile.followers.count > 3 %}
+                                        and {{ profile.followers.count|add:"-3" }} other{{ profile.followers.count|add:"-3"|pluralize }} you follow
+                                    {% endif %}
+                                </small>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Sidebar -->
+                    <div class="col-lg-4">
+                        <!-- Recent Followers -->
+                        {% if recent_followers %}
+                            <div class="card border-0 shadow-sm mb-4">
+                                <div class="card-body">
+                                    <h6 class="card-title">Recent Followers</h6>
+                                    <div class="row g-2">
+                                        {% for follower in recent_followers %}
+                                            <div class="col-4">
+                                                <a href="{% url 'user_profile' follower.username %}" class="text-decoration-none">
+                                                    {% if follower.userprofile.avatar %}
+                                                        <img src="{{ follower.userprofile.avatar.url }}" 
+                                                             class="rounded-circle" 
+                                                             style="width: 40px; height: 40px; object-fit: cover;"
+                                                             title="{{ follower.username }}">
+                                                    {% else %}
+                                                        <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white" 
+                                                             style="width: 40px; height: 40px; font-size: 0.9rem;">
+                                                            {{ follower.username|first|upper }}
+                                                        </div>
+                                                    {% endif %}
+                                                </a>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Profile Views (for profile owner) -->
+                        {% if user == profile_user and profile.profile_views > 0 %}
+                            <div class="card border-0 shadow-sm mb-4">
+                                <div class="card-body">
+                                    <h6 class="card-title">
+                                        <i class="bi bi-eye me-2"></i>Profile Views
+                                    </h6>
+                                    <p class="h4 mb-0 text-primary">{{ profile.profile_views }}</p>
+                                    <small class="text-muted">Total profile views</small>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tweets Section -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="border-top pt-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3 class="h5 mb-0">
+                            <i class="bi bi-chat-text me-2"></i>
+                            {% if user == profile_user %}Your Tweets{% else %}{{ profile_user.username }}'s Tweets{% endif %}
+                        </h3>
+                        
+                        {% if user.is_authenticated and user == profile_user %}
+                            <a href="{% url 'tweet_create' %}" class="btn btn-primary btn-sm rounded-pill">
+                                <i class="bi bi-plus me-1"></i>New Tweet
+                            </a>
+                        {% endif %}
+                    </div>
+                    
+                    {% if can_view_private_content %}
+                        {% if tweets %}
+                            <div class="row">
+                                {% for tweet in tweets %}
+                                    <div class="col-12 mb-4">
+                                        <div class="tweet-card p-4">
+                                            <div class="d-flex">
+                                                <div class="flex-shrink-0 me-3">
+                                                    {% if profile.avatar %}
+                                                        <img src="{{ profile.avatar.url }}" alt="{{ profile_user.username }}" 
+                                                             class="rounded-circle" style="width: 50px; height: 50px; object-fit: cover;">
+                                                    {% else %}
+                                                        <div class="rounded-circle d-flex align-items-center justify-content-center text-white" 
+                                                             style="width: 50px; height: 50px; background: {{ profile.theme_color }}; font-weight: bold;">
+                                                            {{ profile_user.username|first|upper }}
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                                
+                                                <div class="flex-grow-1">
+                                                    <div class="d-flex align-items-center mb-2">
+                                                        <h6 class="mb-0 me-2">{{ profile.get_display_name }}</h6>
+                                                        {% if profile.is_verified %}
+                                                            <i class="bi bi-patch-check-fill text-primary me-2"></i>
+                                                        {% endif %}
+                                                        <small class="text-muted">@{{ profile_user.username }}</small>
+                                                        <span class="text-muted mx-2">•</span>
+                                                        <small class="text-muted">{{ tweet.created_at|timesince }} ago</small>
+                                                        
+                                                        {% if tweet.privacy == 'private' %}
+                                                            <i class="bi bi-lock ms-2 text-warning" title="Private tweet"></i>
+                                                        {% endif %}
+                                                    </div>
+                                                    
+                                                    <p class="mb-3">{{ tweet.text|linebreaks }}</p>
+                                                    
+                                                    {% if tweet.image %}
+                                                        <div class="mb-3">
+                                                            <img src="{{ tweet.image.url }}" class="img-fluid rounded" 
+                                                                 style="max-height: 400px; width: auto;">
+                                                        </div>
+                                                    {% endif %}
+                                                    
+                                                    <!-- Tweet Actions -->
+                                                    <div class="d-flex gap-4">
+                                                        <a href="{% url 'tweet_detail' tweet.id %}" class="btn btn-sm btn-outline-secondary">
+                                                            <i class="bi bi-chat me-1"></i>{{ tweet.get_replies_count }}
+                                                        </a>
+                                                        
+                                                        {% if user.is_authenticated %}
+                                                            <button class="btn btn-sm btn-outline-danger like-tweet-btn 
+                                                                   {% if user in tweet.likes.all %}liked{% endif %}" 
+                                                                    data-tweet-id="{{ tweet.id }}">
+                                                                <i class="bi bi-heart{% if user in tweet.likes.all %}-fill{% endif %} me-1"></i>
+                                                                <span class="like-count">{{ tweet.get_likes_count }}</span>
+                                                            </button>
+                                                        {% else %}
+                                                            <span class="btn btn-sm btn-outline-secondary">
+                                                                <i class="bi bi-heart me-1"></i>{{ tweet.get_likes_count }}
+                                                            </span>
+                                                        {% endif %}
+                                                        
+                                                        {% if user == tweet.user %}
+                                                            <a href="{% url 'tweet_edit' tweet.id %}" class="btn btn-sm btn-outline-primary">
+                                                                <i class="bi bi-pencil"></i>
+                                                            </a>
+                                                            <a href="{% url 'tweet_delete' tweet.id %}" class="btn btn-sm btn-outline-danger">
+                                                                <i class="bi bi-trash"></i>
+                                                            </a>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="bi bi-chat-text text-muted" style="font-size: 4rem;"></i>
+                                <h4 class="text-muted mt-3">No tweets yet</h4>
+                                <p class="text-muted">
+                                    {% if user == profile_user %}
+                                        Start sharing your thoughts with the world!
+                                    {% else %}
+                                        {{ profile_user.username }} hasn't tweeted anything yet.
+                                    {% endif %}
+                                </p>
+                                {% if user == profile_user %}
+                                    <a href="{% url 'tweet_create' %}" class="btn btn-primary">
+                                        <i class="bi bi-plus me-1"></i>Create your first tweet
+                                    </a>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="bi bi-lock text-muted" style="font-size: 4rem;"></i>
+                            <h4 class="text-muted mt-3">This account is private</h4>
+                            <p class="text-muted">Follow @{{ profile_user.username }} to see their tweets.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Follow/Unfollow AJAX -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const followBtn = document.querySelector('.follow-btn');
+    if (followBtn) {
+        followBtn.addEventListener('click', function() {
+            const username = this.dataset.username;
+            const followText = this.querySelector('.follow-text');
+            const icon = this.querySelector('i');
+            
+            fetch(`/profile/${username}/follow/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || '',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+                
+                followText.textContent = data.button_text;
+                this.className = `btn btn-sm rounded-pill follow-btn ${data.button_class}`;
+                
+                if (data.action === 'followed') {
+                    icon.className = 'bi bi-check me-1';
+                } else {
+                    icon.className = 'bi bi-plus me-1';
+                }
+                
+                // Update followers count if displayed
+                const followersCount = document.querySelector('.followers-count');
+                if (followersCount) {
+                    followersCount.textContent = data.followers_count;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Something went wrong. Please try again.');
+            });
+        });
+    }
+});
+</script>
+{% endblock %}

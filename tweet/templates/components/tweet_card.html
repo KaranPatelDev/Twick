@@ -1,0 +1,121 @@
+{% load custom_filters %}
+
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="d-flex align-items-start">
+            <!-- User Avatar -->
+            <div class="me-3">
+                {% if tweet.user.userprofile.avatar %}
+                    <img src="{{ tweet.user.userprofile.avatar.url }}" alt="{{ tweet.user.username }}" class="rounded-circle" width="40" height="40">
+                {% else %}
+                    <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                        <i class="fas fa-user text-white"></i>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Tweet Content -->
+            <div class="flex-grow-1">
+                <div class="d-flex align-items-center mb-2">
+                    <strong><a href="{% url 'user_profile' tweet.user.username %}" class="text-decoration-none">{{ tweet.user.get_full_name|default:tweet.user.username }}</a></strong>
+                    {% if tweet.user.userprofile.is_verified %}
+                        <i class="fas fa-check-circle text-primary ms-1" title="Verified account"></i>
+                    {% endif %}
+                    <span class="text-muted ms-2">@{{ tweet.user.username }}</span>
+                    <span class="text-muted ms-2">•</span>
+                    <span class="text-muted ms-2">{{ tweet.created_at|timesince }} ago</span>
+                    {% if tweet.privacy == 'private' %}
+                        <i class="fas fa-lock text-muted ms-2" title="Private tweet"></i>
+                    {% endif %}
+                </div>
+                
+                <!-- Reply indicator -->
+                {% if tweet.parent_tweet %}
+                    <div class="mb-2 text-muted">
+                        <i class="fas fa-reply"></i> Replying to 
+                        <a href="{% url 'user_profile' tweet.parent_tweet.user.username %}" class="text-decoration-none">@{{ tweet.parent_tweet.user.username }}</a>
+                    </div>
+                {% endif %}
+                
+                <!-- Tweet Text -->
+                <div class="mb-2">
+                    {{ tweet.text|format_tweet_text|safe }}
+                </div>
+                
+                <!-- Tweet Image -->
+                {% if tweet.image %}
+                    <div class="mb-3">
+                        <img src="{{ tweet.image.url }}" alt="Tweet image" class="img-fluid rounded" style="max-height: 400px; cursor: pointer;" onclick="openImageModal('{{ tweet.image.url }}')">
+                    </div>
+                {% endif %}
+                
+                <!-- Hashtags -->
+                {% if tweet.get_hashtags %}
+                    <div class="mb-2">
+                        {% for hashtag in tweet.get_hashtags %}
+                            <a href="{% url 'hashtag_detail' hashtag.name %}" class="badge bg-light text-primary text-decoration-none me-1">#{{ hashtag.name }}</a>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <!-- Tweet Actions -->
+                <div class="d-flex justify-content-between text-muted">
+                    <button class="btn btn-link btn-sm text-muted p-0" onclick="replyToTweet({{ tweet.id }})">
+                        <i class="fas fa-reply"></i> {{ tweet.get_replies_count }}
+                    </button>
+                    
+                    {% if request.user.is_authenticated %}
+                        <button class="btn btn-link btn-sm text-muted p-0" onclick="likeTweet({{ tweet.id }})">
+                            <i class="fas fa-heart {% if request.user in tweet.likes.all %}text-danger{% endif %}" id="like-icon-{{ tweet.id }}"></i>
+                            <span id="like-count-{{ tweet.id }}">{{ tweet.get_likes_count }}</span>
+                        </button>
+                    {% else %}
+                        <span class="btn btn-link btn-sm text-muted p-0">
+                            <i class="fas fa-heart"></i> {{ tweet.get_likes_count }}
+                        </span>
+                    {% endif %}
+                    
+                    <button class="btn btn-link btn-sm text-muted p-0" onclick="shareTweet({{ tweet.id }})">
+                        <i class="fas fa-share"></i>
+                    </button>
+                    
+                    <a href="{% url 'tweet_detail' tweet.id %}" class="btn btn-link btn-sm text-muted p-0">
+                        <i class="fas fa-external-link-alt"></i>
+                    </a>
+                    
+                    <!-- Tweet menu for owner -->
+                    {% if request.user == tweet.user %}
+                        <div class="dropdown">
+                            <button class="btn btn-link btn-sm text-muted p-0" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'tweet_edit' tweet.id %}"><i class="fas fa-edit"></i> Edit</a></li>
+                                <li><a class="dropdown-item text-danger" href="{% url 'tweet_delete' tweet.id %}"><i class="fas fa-trash"></i> Delete</a></li>
+                            </ul>
+                        </div>
+                    {% elif request.user.is_authenticated %}
+                        <div class="dropdown">
+                            <button class="btn btn-link btn-sm text-muted p-0" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" onclick="reportTweet({{ tweet.id }})"><i class="fas fa-flag"></i> Report</a></li>
+                                {% if request.user|is_muted:tweet.user %}
+                                    <li><a class="dropdown-item" href="#" onclick="unmutUser('{{ tweet.user.username }}')"><i class="fas fa-volume-up"></i> Unmute @{{ tweet.user.username }}</a></li>
+                                {% else %}
+                                    <li><a class="dropdown-item" href="#" onclick="muteUser('{{ tweet.user.username }}')"><i class="fas fa-volume-mute"></i> Mute @{{ tweet.user.username }}</a></li>
+                                {% endif %}
+                                {% if request.user|is_blocked:tweet.user %}
+                                    <li><a class="dropdown-item" href="#" onclick="unblockUser('{{ tweet.user.username }}')"><i class="fas fa-unlock"></i> Unblock @{{ tweet.user.username }}</a></li>
+                                {% else %}
+                                    <li><a class="dropdown-item text-danger" href="#" onclick="blockUser('{{ tweet.user.username }}')"><i class="fas fa-ban"></i> Block @{{ tweet.user.username }}</a></li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

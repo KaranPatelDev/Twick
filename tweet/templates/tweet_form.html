@@ -1,0 +1,283 @@
+{% extends "layout.html" %}
+
+{% block title %}
+{% if form.instance.pk %}Edit Tweet{% else %}New Tweet{% endif %} - Twick
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="tweet-card p-4">
+            <div class="d-flex align-items-center mb-4">
+                <a href="{% url 'tweet_list' %}" class="btn btn-outline-secondary me-3">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+                <h2 class="h3 mb-0">
+                    {% if form.instance.pk %}
+                        <i class="bi bi-pencil me-2"></i>Edit Tweet
+                    {% else %}
+                        <i class="bi bi-plus-circle me-2"></i>Create Tweet
+                    {% endif %}
+                </h2>
+            </div>
+
+            <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                {% csrf_token %}
+                
+                <!-- User Info -->
+                <div class="d-flex align-items-center mb-4">
+                    {% if user.userprofile and user.userprofile.avatar %}
+                        <img src="{{ user.userprofile.avatar.url }}" alt="{{ user.username }}" 
+                             class="profile-avatar me-3">
+                    {% else %}
+                        <div class="profile-avatar bg-primary d-flex align-items-center justify-content-center text-white me-3">
+                            {{ user.username|first|upper }}
+                        </div>
+                    {% endif %}
+                    <div>
+                        <h6 class="mb-0">{{ user.get_full_name|default:user.username }}</h6>
+                        <small class="text-muted">@{{ user.username }}</small>
+                    </div>
+                </div>
+
+                <!-- Tweet Text -->
+                <div class="mb-3">
+                    <label for="{{ form.text.id_for_label }}" class="form-label">What's happening?</label>
+                    {{ form.text }}
+                    {% if form.text.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.text.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Image Upload -->
+                <div class="mb-4">
+                    <label for="{{ form.image.id_for_label }}" class="form-label">
+                        <i class="bi bi-image me-1"></i>Add Image (Optional)
+                    </label>
+                    {{ form.image }}
+                    {% if form.image.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.image.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Image Preview -->
+                    {% if form.instance.image %}
+                    <div class="mt-3">
+                        <p class="small text-muted">Current image:</p>
+                        <img src="{{ form.instance.image.url }}" alt="Current image" 
+                             class="img-thumbnail" style="max-width: 200px;">
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Privacy Setting -->
+                <div class="mb-4">
+                    <label for="{{ form.privacy.id_for_label }}" class="form-label">
+                        <i class="bi bi-eye me-1"></i>Privacy
+                    </label>
+                    {{ form.privacy }}
+                    <div class="form-text">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Public tweets can be seen by everyone. Private tweets are only visible to your followers.
+                    </div>
+                    {% if form.privacy.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.privacy.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Form Actions -->
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="text-muted small">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Maximum 280 characters
+                    </div>
+                    
+                    <div>
+                        <a href="{% url 'tweet_list' %}" class="btn btn-outline-secondary me-2">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            {% if form.instance.pk %}
+                                <i class="bi bi-check-circle me-1"></i>Update Tweet
+                            {% else %}
+                                <i class="bi bi-send me-1"></i>Post Tweet
+                            {% endif %}
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Sidebar with Tips -->
+    <div class="col-lg-4">
+        <div class="sidebar">
+            <h5 class="mb-3">
+                <i class="bi bi-lightbulb me-2"></i>Tweet Tips
+            </h5>
+            <ul class="list-unstyled">
+                <li class="mb-2">
+                    <i class="bi bi-check-circle text-success me-2"></i>
+                    Keep it under 280 characters
+                </li>
+                <li class="mb-2">
+                    <i class="bi bi-check-circle text-success me-2"></i>
+                    Use hashtags to reach more people
+                </li>
+                <li class="mb-2">
+                    <i class="bi bi-check-circle text-success me-2"></i>
+                    Add images to make it engaging
+                </li>
+                <li class="mb-2">
+                    <i class="bi bi-check-circle text-success me-2"></i>
+                    Be authentic and respectful
+                </li>
+            </ul>
+        </div>
+        
+        {% if not form.instance.pk %}
+        <div class="sidebar">
+            <h5 class="mb-3">
+                <i class="bi bi-question-circle me-2"></i>What to Tweet?
+            </h5>
+            <p class="text-muted small mb-2">Share your thoughts about:</p>
+            <div class="d-flex flex-wrap gap-1">
+                <span class="badge bg-light text-dark">#technology</span>
+                <span class="badge bg-light text-dark">#coding</span>
+                <span class="badge bg-light text-dark">#life</span>
+                <span class="badge bg-light text-dark">#learning</span>
+                <span class="badge bg-light text-dark">#inspiration</span>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Image preview functionality
+    document.getElementById('{{ form.image.id_for_label }}').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        const existingPreview = document.getElementById('image-preview');
+        
+        // Remove existing preview
+        if (existingPreview) {
+            existingPreview.remove();
+        }
+        
+        if (file) {
+            // Check file size (5MB limit)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('File too large! Please select an image under 5MB.');
+                this.value = '';
+                return;
+            }
+            
+            // Check file type
+            if (!file.type.startsWith('image/')) {
+                alert('Please select a valid image file.');
+                this.value = '';
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.createElement('div');
+                preview.id = 'image-preview';
+                preview.className = 'mt-3';
+                preview.innerHTML = `
+                    <p class="small text-muted">Preview:</p>
+                    <div class="position-relative d-inline-block">
+                        <img src="${e.target.result}" alt="Preview" class="img-thumbnail" style="max-width: 200px;">
+                        <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1" 
+                                onclick="this.parentElement.parentElement.remove(); document.getElementById('{{ form.image.id_for_label }}').value='';">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </div>
+                `;
+                event.target.parentNode.appendChild(preview);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Form validation and character counter
+    const textArea = document.querySelector('textarea[name="text"]');
+    const form = document.querySelector('form');
+    
+    if (textArea) {
+        // Create character counter
+        const counter = document.createElement('div');
+        counter.className = 'small mt-1 d-flex justify-content-between';
+        counter.innerHTML = '<span id="char-count">0/280 characters</span><span id="char-warning"></span>';
+        textArea.parentNode.appendChild(counter);
+        
+        const charCount = document.getElementById('char-count');
+        const charWarning = document.getElementById('char-warning');
+        
+        function updateCharCount() {
+            const length = textArea.value.length;
+            charCount.textContent = `${length}/280 characters`;
+            
+            if (length > 280) {
+                charCount.className = 'text-danger';
+                charWarning.textContent = 'Too many characters!';
+                charWarning.className = 'text-danger';
+            } else if (length > 250) {
+                charCount.className = 'text-warning';
+                charWarning.textContent = 'Getting close to limit';
+                charWarning.className = 'text-warning';
+            } else {
+                charCount.className = 'text-muted';
+                charWarning.textContent = '';
+            }
+        }
+        
+        updateCharCount();
+        textArea.addEventListener('input', updateCharCount);
+        
+        // Form submission validation
+        form.addEventListener('submit', function(e) {
+            const text = textArea.value.trim();
+            
+            if (!text) {
+                e.preventDefault();
+                textArea.classList.add('is-invalid');
+                textArea.focus();
+                alert('Please enter some text for your tweet.');
+                return false;
+            }
+            
+            if (text.length > 280) {
+                e.preventDefault();
+                textArea.classList.add('is-invalid');
+                textArea.focus();
+                alert('Tweet is too long! Please keep it under 280 characters.');
+                return false;
+            }
+            
+            // Show loading state
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Posting...';
+        });
+        
+        // Remove validation classes on input
+        textArea.addEventListener('input', function() {
+            this.classList.remove('is-invalid');
+        });
+    }
+</script>
+{% endblock %}
+{% endblock %}

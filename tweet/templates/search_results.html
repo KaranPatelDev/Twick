@@ -1,0 +1,205 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block title %}Search Results{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <h2>Search Results</h2>
+            
+            <!-- Search Form -->
+            <form method="get" class="mb-4">
+                <div class="row">
+                    <div class="col-md-8">
+                        {{ form.query }}
+                    </div>
+                    <div class="col-md-3">
+                        {{ form.search_type }}
+                    </div>
+                    <div class="col-md-1">
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </div>
+                </div>
+            </form>
+            
+            {% if results.query %}
+                <p class="text-muted">Results for "<strong>{{ results.query }}</strong>"</p>
+                
+                <!-- Navigation Tabs -->
+                <ul class="nav nav-tabs mb-3" id="searchTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab">
+                            All
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="tweets-tab" data-bs-toggle="tab" data-bs-target="#tweets" type="button" role="tab">
+                            Tweets ({{ results.tweets|length }})
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab">
+                            Users ({{ results.users|length }})
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="hashtags-tab" data-bs-toggle="tab" data-bs-target="#hashtags" type="button" role="tab">
+                            Hashtags ({{ results.hashtags|length }})
+                        </button>
+                    </li>
+                </ul>
+                
+                <!-- Tab Content -->
+                <div class="tab-content" id="searchTabsContent">
+                    <!-- All Results Tab -->
+                    <div class="tab-pane fade show active" id="all" role="tabpanel">
+                        {% if results.users %}
+                            <h5>Users</h5>
+                            {% for user in results.users|slice:":3" %}
+                                <div class="card mb-2">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center">
+                                            {% if user.userprofile.avatar %}
+                                                <img src="{{ user.userprofile.avatar.url }}" alt="{{ user.username }}" class="rounded-circle me-3" width="40" height="40">
+                                            {% else %}
+                                                <div class="bg-secondary rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                    <i class="fas fa-user text-white"></i>
+                                                </div>
+                                            {% endif %}
+                                            <div>
+                                                <strong><a href="{% url 'user_profile' user.username %}" class="text-decoration-none">{{ user.get_full_name|default:user.username }}</a></strong>
+                                                <div class="text-muted">@{{ user.username }}</div>
+                                                {% if user.userprofile.bio %}
+                                                    <small class="text-muted">{{ user.userprofile.bio|truncatechars:100 }}</small>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            {% if results.users|length > 3 %}
+                                <p><a href="?query={{ results.query }}&search_type=users">View all users</a></p>
+                            {% endif %}
+                        {% endif %}
+                        
+                        {% if results.hashtags %}
+                            <h5 class="mt-4">Hashtags</h5>
+                            {% for hashtag in results.hashtags|slice:":3" %}
+                                <div class="card mb-2">
+                                    <div class="card-body">
+                                        <strong><a href="{% url 'hashtag_detail' hashtag.name %}" class="text-decoration-none">#{{ hashtag.name }}</a></strong>
+                                        <div class="text-muted">{{ hashtag.tweet_count }} tweet{{ hashtag.tweet_count|pluralize }}</div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            {% if results.hashtags|length > 3 %}
+                                <p><a href="?query={{ results.query }}&search_type=hashtags">View all hashtags</a></p>
+                            {% endif %}
+                        {% endif %}
+                        
+                        {% if results.tweets %}
+                            <h5 class="mt-4">Tweets</h5>
+                            {% for tweet in results.tweets|slice:":5" %}
+                                {% include 'components/tweet_card.html' %}
+                            {% endfor %}
+                            {% if results.tweets|length > 5 %}
+                                <p><a href="?query={{ results.query }}&search_type=tweets">View all tweets</a></p>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Tweets Tab -->
+                    <div class="tab-pane fade" id="tweets" role="tabpanel">
+                        {% for tweet in results.tweets %}
+                            {% include 'components/tweet_card.html' %}
+                        {% empty %}
+                            <p class="text-muted">No tweets found.</p>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Users Tab -->
+                    <div class="tab-pane fade" id="users" role="tabpanel">
+                        {% for user in results.users %}
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center">
+                                            {% if user.userprofile.avatar %}
+                                                <img src="{{ user.userprofile.avatar.url }}" alt="{{ user.username }}" class="rounded-circle me-3" width="50" height="50">
+                                            {% else %}
+                                                <div class="bg-secondary rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                                    <i class="fas fa-user text-white"></i>
+                                                </div>
+                                            {% endif %}
+                                            <div>
+                                                <strong><a href="{% url 'user_profile' user.username %}" class="text-decoration-none">{{ user.get_full_name|default:user.username }}</a></strong>
+                                                <div class="text-muted">@{{ user.username }}</div>
+                                                {% if user.userprofile.bio %}
+                                                    <div class="text-muted">{{ user.userprofile.bio }}</div>
+                                                {% endif %}
+                                                <div class="text-muted">
+                                                    <small>{{ user.userprofile.get_followers_count }} followers</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% if user != request.user and request.user.is_authenticated %}
+                                            <button class="btn btn-outline-primary btn-sm" onclick="followUser('{{ user.username }}')">
+                                                Follow
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <p class="text-muted">No users found.</p>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Hashtags Tab -->
+                    <div class="tab-pane fade" id="hashtags" role="tabpanel">
+                        {% for hashtag in results.hashtags %}
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong><a href="{% url 'hashtag_detail' hashtag.name %}" class="text-decoration-none">#{{ hashtag.name }}</a></strong>
+                                            <div class="text-muted">{{ hashtag.tweet_count }} tweet{{ hashtag.tweet_count|pluralize }}</div>
+                                        </div>
+                                        <a href="{% url 'hashtag_detail' hashtag.name %}" class="btn btn-outline-primary btn-sm">View</a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <p class="text-muted">No hashtags found.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% else %}
+                <p class="text-muted">Enter a search term to find tweets, users, and hashtags.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function followUser(username) {
+    fetch(`/api/follow/${username}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert(data.error);
+        } else {
+            location.reload();
+        }
+    });
+}
+</script>
+{% endblock %}

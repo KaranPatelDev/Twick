@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Containerization - Twick Documentation</title>
+    <meta name="description" content="Complete Docker containerization guide for Twick Django Twitter clone">
+    
+    <!-- Stylesheets -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link href="../assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">
+                Twick Docs
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="getting-started.html">Getting Started</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="architecture.html">Architecture</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="api-reference.html">API</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="containerization.html">Containerization</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <div class="page-header">
+                <h1><i class="bi bi-boxes"></i> Containerization & Docker</h1>
+                <p class="lead">Complete guide to containerizing Twick with Docker for development and production</p>
+            </div>
+
+            <!-- Overview -->
+            <section class="mb-5">
+                <h2><i class="bi bi-info-circle"></i> Overview</h2>
+                <div class="alert alert-info">
+                    <h5><i class="bi bi-docker"></i> Why Docker?</h5>
+                    <p>Docker containerization provides consistent environments across development, testing, and production, eliminating "it works on my machine" issues while simplifying deployment and scaling.</p>
+                </div>
+                
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="benefit-card">
+                            <h4><i class="bi bi-shield-check text-success"></i> Consistency</h4>
+                            <p>Same environment across all stages of development and deployment</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="benefit-card">
+                            <h4><i class="bi bi-speedometer2 text-primary"></i> Performance</h4>
+                            <p>Optimized multi-stage builds and efficient resource utilization</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="benefit-card">
+                            <h4><i class="bi bi-arrows-angle-expand text-info"></i> Scalability</h4>
+                            <p>Easy horizontal scaling with orchestration tools like Docker Swarm or Kubernetes</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="benefit-card">
+                            <h4><i class="bi bi-gear text-warning"></i> Isolation</h4>
+                            <p>Clean separation of services and dependencies</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Prerequisites -->
+            <section class="mb-5">
+                <h2><i class="bi bi-list-check"></i> Prerequisites</h2>
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="requirement-card">
+                            <h4><i class="bi bi-laptop text-primary"></i> System Requirements</h4>
+                            <ul>
+                                <li><strong>Docker Engine</strong> 20.10+ or Docker Desktop</li>
+                                <li><strong>Docker Compose</strong> 2.0+ (included with Docker Desktop)</li>
+                                <li><strong>System Memory</strong> 4GB+ recommended</li>
+                                <li><strong>Disk Space</strong> 10GB+ available</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="requirement-card">
+                            <h4><i class="bi bi-download text-success"></i> Installation</h4>
+                            
+                            <div class="command-card mt-3">
+                                <div class="command-header">
+                                    <i class="bi bi-windows"></i>
+                                    <span>Windows/macOS - Docker Desktop</span>
+                                    <button class="copy-btn" onclick="copyToClipboard('Download Docker Desktop from docker.com')" title="Copy to clipboard">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                                <div class="command-body">
+                                    <code># Download Docker Desktop from docker.com</code>
+                                </div>
+                            </div>
+                            
+                            <div class="command-card mt-2">
+                                <div class="command-header">
+                                    <i class="bi bi-ubuntu"></i>
+                                    <span>Ubuntu/Debian</span>
+                                    <button class="copy-btn" onclick="copyToClipboard('sudo apt update\nsudo apt install docker.io docker-compose')" title="Copy to clipboard">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                                <div class="command-body">
+                                    <code>sudo apt update<br>sudo apt install docker.io docker-compose</code>
+                                </div>
+                            </div>
+                            
+                            <div class="command-card mt-2">
+                                <div class="command-header">
+                                    <i class="bi bi-gear"></i>
+                                    <span>CentOS/RHEL</span>
+                                    <button class="copy-btn" onclick="copyToClipboard('sudo yum install docker docker-compose')" title="Copy to clipboard">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                                <div class="command-body">
+                                    <code>sudo yum install docker docker-compose</code>
+                                </div>
+                            </div>
+                            
+                            <div class="command-card mt-2">
+                                <div class="command-header">
+                                    <i class="bi bi-check-circle"></i>
+                                    <span>Verify Installation</span>
+                                    <button class="copy-btn" onclick="copyToClipboard('docker --version\ndocker-compose --version')" title="Copy to clipboard">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                                <div class="command-body">
+                                    <code>docker --version<br>docker-compose --version</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Dockerfile -->
+            <section class="mb-5" id="dockerfile">
+                <h2><i class="bi bi-file-code"></i> Dockerfile Configuration</h2>
+                <p>Our multi-stage Dockerfile optimizes for both development and production use:</p>
+                
+                <div class="code-card">
+                    <div class="code-header">
+                        <i class="bi bi-file-earmark-code"></i>
+                        <span>Dockerfile - Multi-stage setup for Twick</span>
+                        <button class="copy-btn" onclick="copyToClipboard(`# Multi-stage Dockerfile for Twick
+FROM python:3.12-slim as base
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \\
+    PYTHONUNBUFFERED=1 \\
+    PIP_NO_CACHE_DIR=1 \\
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Create app directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \\
+    build-essential \\
+    libpq-dev \\
+    curl \\
+    && rm -rf /var/lib/apt/lists/*
+
+# Development stage
+FROM base as development
+
+# Install Python dependencies
+COPY requirements.txt requirements-dev.txt ./
+RUN pip install -r requirements-dev.txt
+
+# Copy application code
+COPY . .
+
+# Create media and static directories
+RUN mkdir -p media static staticfiles
+
+# Expose port
+EXPOSE 8000
+
+# Default command for development
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+
+# Production stage
+FROM base as production
+
+# Create non-root user
+RUN useradd --create-home --shell /bin/bash app
+
+# Install only production dependencies
+COPY requirements.txt ./
+RUN pip install -r requirements.txt
+
+# Copy application code
+COPY --chown=app:app . .
+
+# Create necessary directories
+RUN mkdir -p media static staticfiles logs \\
+    && chown -R app:app /app
+
+# Switch to non-root user
+USER app
+
+# Collect static files
+RUN python manage.py collectstatic --noinput
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=30s --start-period=60s --retries=3 \\
+    CMD curl -f http://localhost:8000/health/ || exit 1
+
+# Expose port
+EXPOSE 8000
+
+# Production command
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "twick.wsgi:application"]`)" title="Copy to clipboard">
+                            <i class="bi bi-clipboard"></i>
+                            Copy
+                        </button>
+                    </div>
+                    <div class="code-body">
+# Multi-stage Dockerfile for Twick<br>
+FROM python:3.12-slim as base<br><br>
+
+# Set environment variables<br>
+ENV PYTHONDONTWRITEBYTECODE=1 \<br>
+    PYTHONUNBUFFERED=1 \<br>
+    PIP_NO_CACHE_DIR=1 \<br>
+    PIP_DISABLE_PIP_VERSION_CHECK=1<br><br>
+
+# Create app directory<br>
+WORKDIR /app<br><br>
+
+# Install system dependencies<br>
+RUN apt-get update && apt-get install -y \<br>
+    build-essential \<br>
+    libpq-dev \<br>
+    curl \<br>
+    && rm -rf /var/lib/apt/lists/*<br><br>
+
+# Development stage<br>
+FROM base as development<br><br>
+
+# Install Python dependencies<br>
+COPY requirements.txt requirements-dev.txt ./<br>
+RUN pip install -r requirements-dev.txt<br><br>
+
+# Copy application code<br>
+COPY . .<br><br>
+
+# Create media and static directories<br>
+RUN mkdir -p media static staticfiles<br><br>
+
+# Expose port<br>
+EXPOSE 8000<br><br>
+
+# Default command for development<br>
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]<br><br>
+
+# Production stage<br>
+FROM base as production<br><br>
+
+# Create non-root user<br>
+RUN useradd --create-home --shell /bin/bash app<br><br>
+
+# Install only production dependencies<br>
+COPY requirements.txt ./<br>
+RUN pip install -r requirements.txt<br><br>
+
+# Copy application code<br>
+COPY --chown=app:app . .<br><br>
+
+# Create necessary directories<br>
+RUN mkdir -p media static staticfiles logs \<br>
+    && chown -R app:app /app<br><br>
+
+# Switch to non-root user<br>
+USER app<br><br>
+
+# Collect static files<br>
+RUN python manage.py collectstatic --noinput<br><br>
+
+# Health check<br>
+HEALTHCHECK --interval=30s --timeout=30s --start-period=60s --retries=3 \<br>
+    CMD curl -f http://localhost:8000/health/ || exit 1<br><br>
+
+# Expose port<br>
+EXPOSE 8000<br><br>
+
+# Production command<br>
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "twick.wsgi:application"]
+                    </div>
+                </div>
+                
+                <div class="alert alert-success mt-4">
+                    <h5><i class="bi bi-lightbulb"></i> Dockerfile Features</h5>
+                    <ul class="mb-0">
+                        <li><strong>Multi-stage builds:</strong> Separate development and production stages</li>
+                        <li><strong>Security:</strong> Non-root user for production</li>
+                        <li><strong>Health checks:</strong> Built-in container health monitoring</li>
+                        <li><strong>Optimization:</strong> Minimal production image size</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Docker Compose -->
+            <section class="mb-5" id="docker-compose">
+                <h2><i class="bi bi-boxes"></i> Docker Compose Setup</h2>
+                
+                <h3>Development Configuration</h3>
+                <div class="code-card">
+                    <div class="code-header">
+                        <i class="bi bi-file-earmark-code"></i>
+                        <span>docker-compose.yml - Development setup</span>
+                        <button class="copy-btn" onclick="copyToClipboard('# docker-compose.yml - Development setup\nversion: \'3.8\'\n\nservices:\n  web:\n    build:\n      context: .\n      dockerfile: Dockerfile\n      target: development\n    ports:\n      - \"8000:8000\"\n    environment:\n      - DEBUG=True\n      - DATABASE_URL=postgresql://postgres:postgres@db:5432/twick\n      - REDIS_URL=redis://redis:6379/0\n      - ALLOWED_HOSTS=localhost,127.0.0.1\n    volumes:\n      - .:/app\n      - media_data:/app/media\n      - static_data:/app/static\n    depends_on:\n      db:\n        condition: service_healthy\n      redis:\n        condition: service_started\n    networks:\n      - twick-network\n\n  db:\n    image: postgres:15-alpine\n    environment:\n      - POSTGRES_DB=twick\n      - POSTGRES_USER=postgres\n      - POSTGRES_PASSWORD=postgres\n    volumes:\n      - postgres_data:/var/lib/postgresql/data\n      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql\n    ports:\n      - \"5432:5432\"\n    healthcheck:\n      test: [\"CMD-SHELL\", \"pg_isready -U postgres\"]\n      interval: 10s\n      timeout: 5s\n      retries: 5\n    networks:\n      - twick-network\n\n  redis:\n    image: redis:7-alpine\n    ports:\n      - \"6379:6379\"\n    volumes:\n      - redis_data:/data\n    healthcheck:\n      test: [\"CMD\", \"redis-cli\", \"ping\"]\n      interval: 10s\n      timeout: 5s\n      retries: 5\n    networks:\n      - twick-network\n\n  mailhog:\n    image: mailhog/mailhog:latest\n    ports:\n      - \"1025:1025\"  # SMTP server\n      - \"8025:8025\"  # Web UI\n    networks:\n      - twick-network\n\nvolumes:\n  postgres_data:\n  redis_data:\n  media_data:\n  static_data:\n\nnetworks:\n  twick-network:\n    driver: bridge')" title="Copy to clipboard">
+                            <i class="bi bi-clipboard"></i>
+                            Copy
+                        </button>
+                    </div>
+                    <div class="code-body">
+# docker-compose.yml - Development setup<br>
+version: '3.8'<br><br>
+
+services:<br>
+  web:<br>
+    build:<br>
+      context: .<br>
+      dockerfile: Dockerfile<br>
+      target: development<br>
+    ports:<br>
+      - "8000:8000"<br>
+    environment:<br>
+      - DEBUG=True<br>
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/twick<br>
+      - REDIS_URL=redis://redis:6379/0<br>
+      - ALLOWED_HOSTS=localhost,127.0.0.1<br>
+    volumes:<br>
+      - .:/app<br>
+      - media_data:/app/media<br>
+      - static_data:/app/static<br>
+    depends_on:<br>
+      db:<br>
+        condition: service_healthy<br>
+      redis:<br>
+        condition: service_started<br>
+    networks:<br>
+      - twick-network<br><br>
+
+  db:<br>
+    image: postgres:15-alpine<br>
+    environment:<br>
+      - POSTGRES_DB=twick<br>
+      - POSTGRES_USER=postgres<br>
+      - POSTGRES_PASSWORD=postgres<br>
+    volumes:<br>
+      - postgres_data:/var/lib/postgresql/data<br>
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql<br>
+    ports:<br>
+      - "5432:5432"<br>
+    healthcheck:<br>
+      test: ["CMD-SHELL", "pg_isready -U postgres"]<br>
+      interval: 10s<br>
+      timeout: 5s<br>
+      retries: 5<br>
+    networks:<br>
+      - twick-network<br><br>
+
+  redis:<br>
+    image: redis:7-alpine<br>
+    ports:<br>
+      - "6379:6379"<br>
+    volumes:<br>
+      - redis_data:/data<br>
+    healthcheck:<br>
+      test: ["CMD", "redis-cli", "ping"]<br>
+      interval: 10s<br>
+      timeout: 5s<br>
+      retries: 5<br>
+    networks:<br>
+      - twick-network<br><br>
+
+  mailhog:<br>
+    image: mailhog/mailhog:latest<br>
+    ports:<br>
+      - "1025:1025"  # SMTP server<br>
+      - "8025:8025"  # Web UI<br>
+    networks:<br>
+      - twick-network<br><br>
+
+volumes:<br>
+  postgres_data:<br>
+  redis_data:<br>
+  media_data:<br>
+  static_data:<br><br>
+
+networks:<br>
+  twick-network:<br>
+    driver: bridge
+                    </div>
+                </div>
+
+                <h3>Production Configuration</h3>
+                <div class="code-card">
+                    <div class="code-card-header">
+                        <div class="code-card-title">
+                            <i class="bi bi-filetype-yml"></i>
+                            <span>docker-compose.prod.yml</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyCode(this)" data-bs-toggle="tooltip" data-bs-placement="top" title="Copy to clipboard">
+                            <i class="bi bi-copy"></i>
+                        </button>
+                    </div>
+                    <div class="code-card-body">
+                        <pre><code class="language-yaml"># docker-compose.prod.yml - Production setup
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    environment:
+      - DEBUG=False
+      - DATABASE_URL=postgresql://twick_user:${DB_PASSWORD}@db:5432/twick
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=${SECRET_KEY}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
+    volumes:
+      - media_data:/app/media
+      - static_data:/app/staticfiles
+      - logs:/app/logs
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - twick-network
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+      - static_data:/app/staticfiles
+      - media_data:/app/media
+    depends_on:
+      - web
+    restart: unless-stopped
+    networks:
+      - twick-network
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=twick
+      - POSTGRES_USER=twick_user
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backups:/backups
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U twick_user"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - twick-network
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    healthcheck:
+      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - twick-network
+
+  backup:
+    image: postgres:15-alpine
+    environment:
+      - PGPASSWORD=${DB_PASSWORD}
+    volumes:
+      - ./backups:/backups
+      - ./scripts/backup.sh:/backup.sh
+    command: /bin/sh -c "chmod +x /backup.sh && crond -f"
+    depends_on:
+      - db
+    restart: unless-stopped
+    networks:
+      - twick-network
+
+volumes:
+  postgres_data:
+  redis_data:
+  media_data:
+  static_data:
+  logs:
+
+networks:
+  twick-network:
+    driver: bridge</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Start -->
+            <section class="mb-5">
+                <h2><i class="bi bi-rocket-takeoff"></i> Quick Start</h2>
+                
+                <div class="step-container">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Clone Repository</h4>
+                            <pre><code class="language-bash">git clone https://github.com/yourusername/twick.git
+cd twick</code></pre>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Environment Setup</h4>
+                            <pre><code class="language-bash"># Copy environment template
+cp .env.example .env
+
+# Edit environment variables
+# Set DEBUG=True for development</code></pre>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Start Services</h4>
+                            <pre><code class="language-bash"># Development
+docker-compose up --build
+
+# Production
+docker-compose -f docker-compose.prod.yml up -d --build</code></pre>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Initialize Database</h4>
+                            <pre><code class="language-bash"># Run migrations
+docker-compose exec web python manage.py migrate
+
+# Create superuser
+docker-compose exec web python manage.py createsuperuser</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Environment Variables -->
+            <section class="mb-5">
+                <h2><i class="bi bi-gear"></i> Environment Variables</h2>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Variable</th>
+                                <th>Description</th>
+                                <th>Development</th>
+                                <th>Production</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>DEBUG</code></td>
+                                <td>Enable Django debug mode</td>
+                                <td><span class="badge bg-success">True</span></td>
+                                <td><span class="badge bg-danger">False</span></td>
+                            </tr>
+                            <tr>
+                                <td><code>SECRET_KEY</code></td>
+                                <td>Django secret key</td>
+                                <td>Simple key</td>
+                                <td><strong>Secure random key</strong></td>
+                            </tr>
+                            <tr>
+                                <td><code>DATABASE_URL</code></td>
+                                <td>PostgreSQL connection string</td>
+                                <td>Local database</td>
+                                <td>Production database</td>
+                            </tr>
+                            <tr>
+                                <td><code>REDIS_URL</code></td>
+                                <td>Redis connection string</td>
+                                <td>Local Redis</td>
+                                <td>Production Redis</td>
+                            </tr>
+                            <tr>
+                                <td><code>ALLOWED_HOSTS</code></td>
+                                <td>Allowed host domains</td>
+                                <td>localhost,127.0.0.1</td>
+                                <td>yourdomain.com</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Production Deployment -->
+            <section class="mb-5" id="production">
+                <h2><i class="bi bi-cloud-arrow-up"></i> Production Deployment</h2>
+                
+                <div class="alert alert-warning">
+                    <h5><i class="bi bi-exclamation-triangle"></i> Production Checklist</h5>
+                    <p>Before deploying to production, ensure you have:</p>
+                    <ul class="mb-0">
+                        <li>Secure secret key and database passwords</li>
+                        <li>SSL certificates configured</li>
+                        <li>Domain DNS properly configured</li>
+                        <li>Backup strategy in place</li>
+                        <li>Monitoring and logging configured</li>
+                    </ul>
+                </div>
+                
+                <h3>SSL Certificate Setup</h3>
+                <div class="command-card">
+                    <div class="command-card-header">
+                        <div class="command-card-title">
+                            <i class="bi bi-terminal"></i>
+                            <span>SSL Certificate Setup</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyCode(this)" data-bs-toggle="tooltip" data-bs-placement="top" title="Copy to clipboard">
+                            <i class="bi bi-copy"></i>
+                        </button>
+                    </div>
+                    <div class="command-card-body">
+                        <pre><code class="language-bash"># Install Certbot
+sudo apt install certbot python3-certbot-nginx
+
+# Obtain SSL certificate
+sudo certbot certonly --standalone -d yourdomain.com
+
+# Copy certificates to project
+sudo cp /etc/letsencrypt/live/yourdomain.com/fullchain.pem nginx/ssl/
+sudo cp /etc/letsencrypt/live/yourdomain.com/privkey.pem nginx/ssl/
+
+# Set proper permissions
+sudo chown $USER:$USER nginx/ssl/*</code></pre>
+                    </div>
+                </div>
+                
+                <h3>Nginx Configuration</h3>
+                <div class="code-card">
+                    <div class="code-card-header">
+                        <div class="code-card-title">
+                            <i class="bi bi-gear-fill"></i>
+                            <span>nginx/nginx.conf</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyCode(this)" data-bs-toggle="tooltip" data-bs-placement="top" title="Copy to clipboard">
+                            <i class="bi bi-copy"></i>
+                        </button>
+                    </div>
+                    <div class="code-card-body">
+                        <pre><code class="language-nginx"># nginx/nginx.conf
+upstream twick_web {
+    server web:8000;
+}
+
+server {
+    listen 80;
+    server_name yourdomain.com;
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name yourdomain.com;
+
+    ssl_certificate /etc/nginx/ssl/fullchain.pem;
+    ssl_certificate_key /etc/nginx/ssl/privkey.pem;
+    
+    client_max_body_size 20M;
+    
+    location / {
+        proxy_pass http://twick_web;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    
+    location /static/ {
+        alias /app/staticfiles/;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+    
+    location /media/ {
+        alias /app/media/;
+        expires 1y;
+        add_header Cache-Control "public";
+    }
+}</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Monitoring & Logging -->
+            <section class="mb-5">
+                <h2><i class="bi bi-graph-up"></i> Monitoring & Logging</h2>
+                
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="monitoring-card">
+                            <h4><i class="bi bi-activity text-primary"></i> Health Checks</h4>
+                            <p>Built-in Docker health checks monitor service status:</p>
+                            <pre><code class="language-bash"># Check container health
+docker-compose ps
+
+# View health check logs
+docker inspect twick_web_1 | grep Health</code></pre>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="monitoring-card">
+                            <h4><i class="bi bi-file-text text-success"></i> Logs</h4>
+                            <p>Centralized logging for all services:</p>
+                            <pre><code class="language-bash"># View all logs
+docker-compose logs -f
+
+# View specific service logs
+docker-compose logs -f web
+docker-compose logs -f db</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Troubleshooting -->
+            <section class="mb-5">
+                <h2><i class="bi bi-tools"></i> Common Issues</h2>
+                
+                <div class="accordion" id="troubleshootingAccordion">
+                    <div class="accordion-item">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#issue1">
+                                Container fails to start
+                            </button>
+                        </h3>
+                        <div id="issue1" class="accordion-collapse collapse show" data-bs-parent="#troubleshootingAccordion">
+                            <div class="accordion-body">
+                                <p><strong>Solution:</strong></p>
+                                <pre><code class="language-bash"># Check logs for errors
+docker-compose logs web
+
+# Rebuild without cache
+docker-compose build --no-cache
+
+# Check environment variables
+docker-compose config</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#issue2">
+                                Database connection fails
+                            </button>
+                        </h3>
+                        <div id="issue2" class="accordion-collapse collapse" data-bs-parent="#troubleshootingAccordion">
+                            <div class="accordion-body">
+                                <p><strong>Solution:</strong></p>
+                                <pre><code class="language-bash"># Check database is running
+docker-compose ps db
+
+# Test database connection
+docker-compose exec db psql -U postgres -d twick
+
+# Restart database service
+docker-compose restart db</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#issue3">
+                                Permission denied errors
+                            </button>
+                        </h3>
+                        <div id="issue3" class="accordion-collapse collapse" data-bs-parent="#troubleshootingAccordion">
+                            <div class="accordion-body">
+                                <p><strong>Solution:</strong></p>
+                                <pre><code class="language-bash"># Fix volume permissions
+sudo chown -R $USER:$USER media/ static/
+
+# Reset Docker volumes
+docker-compose down -v
+docker-compose up --build</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Navigation -->
+            <nav class="page-nav">
+                <a href="architecture.html" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left"></i> Architecture
+                </a>
+                <a href="troubleshooting.html" class="btn btn-primary">
+                    Troubleshooting <i class="bi bi-arrow-right"></i>
+                </a>
+            </nav>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <p>&copy; 2024 Twick Documentation. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <a href="https://www.linkedin.com/in/karan-patel-16700a215/" target="_blank" rel="noopener">
+                        <i class="bi bi-linkedin"></i> LinkedIn
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script src="../assets/js/main.js"></script>
+</body>
+</html>

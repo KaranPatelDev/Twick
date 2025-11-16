@@ -1,0 +1,92 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block title %}Trending{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <h2><i class="fas fa-fire me-2"></i>Trending Hashtags</h2>
+            <p class="text-muted mb-4">Discover what's trending right now</p>
+            
+            {% for trending in trending_hashtags %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="mb-1">
+                                    <a href="{% url 'hashtag_detail' trending.hashtag.name %}" class="text-decoration-none">
+                                        #{{ trending.hashtag.name }}
+                                    </a>
+                                </h5>
+                                <div class="text-muted">
+                                    <small>
+                                        {{ trending.tweets_last_24h }} tweets in the last 24 hours
+                                        {% if trending.tweets_last_week > trending.tweets_last_24h %}
+                                            • {{ trending.tweets_last_week }} this week
+                                        {% endif %}
+                                    </small>
+                                </div>
+                                <div class="mt-2">
+                                    <span class="badge bg-primary">Trend Score: {{ trending.trend_score|floatformat:1 }}</span>
+                                    {% if trending.trend_score > 50 %}
+                                        <span class="badge bg-danger">🔥 Hot</span>
+                                    {% elif trending.trend_score > 20 %}
+                                        <span class="badge bg-warning">📈 Rising</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <a href="{% url 'hashtag_detail' trending.hashtag.name %}" class="btn btn-outline-primary btn-sm">
+                                    View Tweets
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="text-center py-5">
+                    <i class="fas fa-hashtag fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No trending hashtags</h5>
+                    <p class="text-muted">Start using hashtags in your tweets to see them trend!</p>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Sidebar with related info -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">How Trending Works</h6>
+                </div>
+                <div class="card-body">
+                    <p class="small text-muted">
+                        Hashtags are ranked by how frequently they're used in recent tweets. 
+                        The trend score considers both volume and recency.
+                    </p>
+                    <ul class="small text-muted">
+                        <li>🔥 Hot: Very active (50+ trend score)</li>
+                        <li>📈 Rising: Growing (20+ trend score)</li>
+                        <li>Recent activity is weighted more heavily</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="mb-0">Create a Trend</h6>
+                </div>
+                <div class="card-body">
+                    <p class="small text-muted">
+                        Want to start a trend? Include hashtags in your tweets and encourage others to use them!
+                    </p>
+                    <a href="{% url 'tweet_create' %}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus"></i> Create Tweet
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

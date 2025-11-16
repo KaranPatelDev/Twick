@@ -1,0 +1,1138 @@
+{% extends 'layout.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}{{ conversation.group_name|default:"Chat" }} - Messages{% endblock %}
+
+{% block extra_css %}
+<style>
+    .chat-container {
+        height: calc(100vh - 120px);
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .chat-header {
+        background: linear-gradient(135deg, #1DA1F2, #1991DB);
+        color: white;
+        padding: 1rem;
+        border-radius: 10px 10px 0 0;
+    }
+    
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1rem;
+        background: #f8f9fa;
+        scroll-behavior: smooth;
+    }
+    
+    .message-bubble {
+        max-width: 70%;
+        margin-bottom: 1rem;
+        animation: fadeInUp 0.3s ease-out;
+    }
+    
+    .message-bubble.own {
+        margin-left: auto;
+    }
+    
+    .message-bubble.other {
+        margin-right: auto;
+    }
+    
+    .bubble-content {
+        padding: 0.75rem 1rem;
+        border-radius: 18px;
+        position: relative;
+        word-wrap: break-word;
+    }
+    
+    .bubble-content.own {
+        background: linear-gradient(135deg, #1DA1F2, #1991DB);
+        color: white;
+        border-bottom-right-radius: 5px;
+    }
+    
+    .bubble-content.other {
+        background: white;
+        color: #333;
+        border: 1px solid #e1e8ed;
+        border-bottom-left-radius: 5px;
+    }
+    
+    .message-time {
+        font-size: 0.75rem;
+        opacity: 0.7;
+        margin-top: 0.25rem;
+    }
+    
+    .message-status {
+        font-size: 0.7rem;
+        opacity: 0.8;
+        margin-top: 0.25rem;
+    }
+    
+    .typing-indicator {
+        display: none;
+        padding: 1rem;
+        font-style: italic;
+        color: #666;
+    }
+    
+    .typing-dots {
+        display: inline-block;
+        position: relative;
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background-color: #666;
+        animation: typingAnimation 1.4s infinite ease-in-out both;
+    }
+    
+    .typing-dots:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dots:nth-child(2) { animation-delay: -0.16s; margin-left: 8px; }
+    .typing-dots:nth-child(3) { margin-left: 8px; }
+    
+    @keyframes typingAnimation {
+        0%, 80%, 100% { transform: scale(0); }
+        40% { transform: scale(1); }
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .chat-input-container {
+        background: white;
+        border-top: 1px solid #e1e8ed;
+        padding: 1rem;
+        border-radius: 0 0 10px 10px;
+    }
+    
+    .attachment-preview {
+        max-height: 200px;
+        border-radius: 10px;
+        margin: 0.5rem 0;
+    }
+    
+    .emoji-picker {
+        display: none;
+        position: absolute;
+        bottom: 100%;
+        right: 0;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 1rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        z-index: 1000;
+        max-height: 200px;
+        max-width: 300px;
+        overflow-y: auto;
+    }
+    
+    .emoji-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(30px, 1fr));
+        gap: 0.25rem;
+        max-width: 250px;
+    }
+    
+    .emoji-picker .emoji {
+        cursor: pointer;
+        padding: 0.25rem;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        transition: background-color 0.2s;
+    }
+    
+    .emoji-picker .emoji:hover {
+        background: #f0f0f0;
+    }
+    
+    .conversation-list {
+        max-height: calc(100vh - 200px);
+        overflow-y: auto;
+    }
+    
+    .conversation-item {
+        border: none;
+        border-radius: 10px;
+        margin-bottom: 0.5rem;
+        transition: all 0.2s;
+    }
+    
+    .conversation-item:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .conversation-item.active {
+        background: linear-gradient(135deg, #1DA1F2, #1991DB);
+        color: white;
+    }
+    
+    .input-group .form-control {
+        border-radius: 25px;
+        resize: none;
+        min-height: 45px;
+        padding: 0.75rem 1rem;
+    }
+    
+    .input-group .btn {
+        border-radius: 50%;
+        width: 45px;
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .message-bubble {
+        animation: slideInUp 0.3s ease-out;
+    }
+    
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .online-indicator {
+        position: absolute;
+        bottom: 2px;
+        right: 2px;
+        width: 12px;
+        height: 12px;
+        background: #28a745;
+        border: 2px solid white;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+    
+    .unread-badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        min-width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: bold;
+    }
+    
+    .file-preview-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem;
+        background: rgba(29, 161, 242, 0.1);
+        border: 1px solid rgba(29, 161, 242, 0.3);
+        border-radius: 10px;
+        margin-bottom: 0.5rem;
+    }
+    
+    .file-preview-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 0.75rem;
+        color: white;
+        font-size: 1.1rem;
+    }
+    
+    .message-actions {
+        opacity: 0;
+        transition: opacity 0.2s;
+        margin-top: 0.25rem;
+    }
+    
+    .message-bubble:hover .message-actions {
+        opacity: 1;
+    }
+    
+    .reaction-button {
+        background: none;
+        border: none;
+        padding: 0.25rem;
+        border-radius: 50%;
+        color: #6c757d;
+        transition: all 0.2s;
+    }
+    
+    .reaction-button:hover {
+        background: rgba(29, 161, 242, 0.1);
+        color: #1DA1F2;
+    }
+    
+    .search-input {
+        border-radius: 25px;
+        padding: 0.5rem 1rem;
+        border: 1px solid #e1e8ed;
+        transition: all 0.2s;
+    }
+    
+    .search-input:focus {
+        border-color: #1DA1F2;
+        box-shadow: 0 0 0 0.2rem rgba(29, 161, 242, 0.25);
+    }
+        background: #f0f0f0;
+    }
+    
+    .reply-to-message {
+        background: rgba(29, 161, 242, 0.1);
+        border-left: 3px solid #1DA1F2;
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
+        border-radius: 5px;
+        font-size: 0.9rem;
+    }
+    
+    .message-reactions {
+        margin-top: 0.5rem;
+    }
+    
+    .reaction-btn {
+        background: rgba(0,0,0,0.05);
+        border: none;
+        border-radius: 15px;
+        padding: 0.25rem 0.5rem;
+        margin-right: 0.25rem;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .reaction-btn:hover {
+        background: rgba(29, 161, 242, 0.1);
+    }
+    
+    .reaction-btn.active {
+        background: rgba(29, 161, 242, 0.2);
+        color: #1DA1F2;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Conversations Sidebar -->
+        <div class="col-md-4 border-end" style="height: calc(100vh - 120px); overflow-y: auto;">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5><i class="bi bi-chat-dots me-2"></i>Messages</h5>
+                <a href="{% url 'start_conversation' %}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-plus-circle"></i> New
+                </a>
+            </div>
+            
+            <!-- Search conversations -->
+            <div class="mb-3">
+                <input type="text" class="form-control" placeholder="Search conversations..." id="conversationSearch">
+            </div>
+            
+            <div class="list-group conversation-list">
+                {% for conv in request.user.conversations.all %}
+                    <a href="{% url 'conversation_detail' conv.id %}" class="list-group-item list-group-item-action {% if conv.id == conversation.id %}active{% endif %} conversation-item">
+                        <div class="d-flex align-items-center position-relative">
+                            {% if conv.is_group %}
+                                {% if conv.group_avatar %}
+                                    <img src="{{ conv.group_avatar.url }}" alt="Group" class="rounded-circle me-3" width="45" height="45">
+                                {% else %}
+                                    <div class="bg-gradient rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                        <i class="bi bi-people text-white"></i>
+                                    </div>
+                                {% endif %}
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between">
+                                        <strong>{{ conv.group_name|default:"Group Chat" }}</strong>
+                                        <small class="text-muted">{{ conv.updated_at|timesince }}</small>
+                                    </div>
+                                    <div class="text-muted small">{{ conv.participants.count }} members</div>
+                                    {% with last_message=conv.get_last_message %}
+                                        {% if last_message %}
+                                            <div class="text-muted small text-truncate" style="max-width: 200px;">
+                                                {{ last_message.sender.username }}: {{ last_message.content|default:"Media message"|truncatechars:30 }}
+                                            </div>
+                                        {% endif %}
+                                    {% endwith %}
+                                </div>
+                            {% else %}
+                                {% for participant in conv.participants.all %}
+                                    {% if participant != request.user %}
+                                        <div class="position-relative">
+                                            {% if participant.userprofile.avatar %}
+                                                <img src="{{ participant.userprofile.avatar.url }}" alt="{{ participant.username }}" class="rounded-circle me-3" width="45" height="45">
+                                            {% else %}
+                                                <div class="bg-primary rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                                                    <i class="bi bi-person text-white"></i>
+                                                </div>
+                                            {% endif %}
+                                            <!-- Online status indicator -->
+                                            <span class="position-absolute top-0 start-100 translate-middle p-1 bg-success border border-light rounded-circle" style="font-size: 0.5rem; margin-left: -15px; margin-top: 5px;">
+                                                <span class="visually-hidden">Online</span>
+                                            </span>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <strong>{{ participant.get_full_name|default:participant.username }}</strong>
+                                                <small class="text-muted">{{ conv.updated_at|timesince }}</small>
+                                            </div>
+                                            <div class="text-muted small">@{{ participant.username }}</div>
+                                            {% with last_message=conv.get_last_message %}
+                                                {% if last_message %}
+                                                    <div class="text-muted small text-truncate" style="max-width: 200px;">
+                                                        {% if last_message.sender == request.user %}You: {% endif %}
+                                                        {{ last_message.content|default:"Media message"|truncatechars:25 }}
+                                                    </div>
+                                                {% endif %}
+                                            {% endwith %}
+                                        </div>
+                                        <!-- Unread message badge -->
+                                        {% with unread_count=conv.get_unread_count %}
+                                            {% if unread_count > 0 %}
+                                                <span class="badge bg-danger rounded-pill">{{ unread_count }}</span>
+                                            {% endif %}
+                                        {% endwith %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </a>
+                {% empty %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-chat-dots text-muted" style="font-size: 3rem;"></i>
+                        <p class="text-muted mt-2">No conversations yet</p>
+                        <a href="{% url 'start_conversation' %}" class="btn btn-primary">Start a conversation</a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="col-md-8">
+            <div class="chat-container">
+                <!-- Chat Header -->
+                <div class="chat-header">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            {% if conversation.is_group %}
+                                {% if conversation.group_avatar %}
+                                    <img src="{{ conversation.group_avatar.url }}" alt="Group" class="rounded-circle me-3" width="40" height="40">
+                                {% else %}
+                                    <div class="bg-white bg-opacity-25 rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                        <i class="bi bi-people"></i>
+                                    </div>
+                                {% endif %}
+                                <div>
+                                    <h6 class="mb-0">{{ conversation.group_name|default:"Group Chat" }}</h6>
+                                    <small class="opacity-75">{{ conversation.participants.count }} members</small>
+                                </div>
+                            {% else %}
+                                {% for participant in conversation.participants.all %}
+                                    {% if participant != request.user %}
+                                        {% if participant.userprofile.avatar %}
+                                            <img src="{{ participant.userprofile.avatar.url }}" alt="{{ participant.username }}" class="rounded-circle me-3" width="40" height="40">
+                                        {% else %}
+                                            <div class="bg-white bg-opacity-25 rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                <i class="bi bi-person"></i>
+                                            </div>
+                                        {% endif %}
+                                        <div>
+                                            <h6 class="mb-0">{{ participant.get_full_name|default:participant.username }}</h6>
+                                            <small class="opacity-75">
+                                                <i class="bi bi-circle-fill text-success" style="font-size: 0.5rem;"></i>
+                                                Online
+                                            </small>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Chat actions -->
+                        <div class="dropdown">
+                            <button class="btn btn-link text-white" type="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-search me-2"></i>Search in chat</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-volume-mute me-2"></i>Mute notifications</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-archive me-2"></i>Archive chat</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash me-2"></i>Delete chat</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="col-md-8">
+            <div class="chat-container">
+                <!-- Chat Header -->
+                <div class="chat-header">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            {% if conversation.is_group %}
+                                {% if conversation.group_avatar %}
+                                    <img src="{{ conversation.group_avatar.url }}" alt="Group" class="rounded-circle me-3" width="40" height="40">
+                                {% else %}
+                                    <div class="bg-white bg-opacity-25 rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                        <i class="bi bi-people"></i>
+                                    </div>
+                                {% endif %}
+                                <div>
+                                    <h6 class="mb-0">{{ conversation.group_name|default:"Group Chat" }}</h6>
+                                    <small class="opacity-75">{{ conversation.participants.count }} members</small>
+                                </div>
+                            {% else %}
+                                {% for participant in conversation.participants.all %}
+                                    {% if participant != request.user %}
+                                        {% if participant.userprofile.avatar %}
+                                            <img src="{{ participant.userprofile.avatar.url }}" alt="{{ participant.username }}" class="rounded-circle me-3" width="40" height="40">
+                                        {% else %}
+                                            <div class="bg-white bg-opacity-25 rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                <i class="bi bi-person"></i>
+                                            </div>
+                                        {% endif %}
+                                        <div>
+                                            <h6 class="mb-0">{{ participant.get_full_name|default:participant.username }}</h6>
+                                            <small class="opacity-75">
+                                                <i class="bi bi-circle-fill text-success" style="font-size: 0.5rem;"></i>
+                                                Online
+                                            </small>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Chat actions -->
+                        <div class="dropdown">
+                            <button class="btn btn-link text-white" type="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-search me-2"></i>Search in chat</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-volume-mute me-2"></i>Mute notifications</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-archive me-2"></i>Archive chat</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash me-2"></i>Delete chat</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Messages Area -->
+                <div class="chat-messages" id="messagesContainer">
+                    {% for message in messages %}
+                        <div class="message-bubble {% if message.sender == request.user %}own{% else %}other{% endif %}" data-message-id="{{ message.id }}">
+                            <!-- Reply indicator -->
+                            {% if message.reply_to %}
+                                <div class="reply-to-message">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-reply me-2"></i>
+                                        <small>
+                                            <strong>{{ message.reply_to.sender.username }}</strong>: 
+                                            {{ message.reply_to.content|truncatechars:50 }}
+                                        </small>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            
+                            <div class="bubble-content {% if message.sender == request.user %}own{% else %}other{% endif %}">
+                                <!-- Message content based on type -->
+                                {% if message.message_type == 'text' %}
+                                    {{ message.content|format_tweet_text }}
+                                    
+                                {% elif message.message_type == 'image' %}
+                                    <div class="message-media">
+                                        <img src="{{ message.image.url }}" alt="Image" class="attachment-preview img-fluid rounded" onclick="openImageModal('{{ message.image.url }}')">
+                                        {% if message.content %}
+                                            <div class="mt-2">{{ message.content|format_tweet_text }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                {% elif message.message_type == 'video' %}
+                                    <div class="message-media">
+                                        <video controls class="attachment-preview img-fluid rounded">
+                                            <source src="{{ message.video.url }}" type="video/mp4">
+                                            Your browser does not support the video tag.
+                                        </video>
+                                        {% if message.content %}
+                                            <div class="mt-2">{{ message.content|format_tweet_text }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                {% elif message.message_type == 'audio' %}
+                                    <div class="message-media">
+                                        <div class="d-flex align-items-center p-2 bg-opacity-25 rounded" style="background: rgba(0,0,0,0.1);">
+                                            <i class="bi bi-music-note-beamed me-2"></i>
+                                            <audio controls class="flex-grow-1">
+                                                <source src="{{ message.audio.url }}" type="audio/mpeg">
+                                                Your browser does not support the audio element.
+                                            </audio>
+                                        </div>
+                                        {% if message.content %}
+                                            <div class="mt-2">{{ message.content|format_tweet_text }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                {% elif message.message_type == 'file' %}
+                                    <div class="message-media">
+                                        <div class="d-flex align-items-center p-2 bg-opacity-25 rounded" style="background: rgba(0,0,0,0.1);">
+                                            <i class="bi bi-file-earmark me-2"></i>
+                                            <div class="flex-grow-1">
+                                                <a href="{{ message.file.url }}" target="_blank" class="text-decoration-none {% if message.sender == request.user %}text-white{% else %}text-primary{% endif %}">
+                                                    <strong>Download File</strong>
+                                                </a>
+                                                <div class="small opacity-75">{{ message.file.name|default:"Unknown file" }}</div>
+                                            </div>
+                                            <i class="bi bi-download"></i>
+                                        </div>
+                                        {% if message.content %}
+                                            <div class="mt-2">{{ message.content|format_tweet_text }}</div>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                                
+                                <!-- Message metadata -->
+                                <div class="message-time {% if message.sender == request.user %}text-end{% endif %}">
+                                    {{ message.sent_at|date:"H:i" }}
+                                    {% if message.sender == request.user %}
+                                        <span class="message-status">
+                                            {% if message.read_by.count > 1 %}
+                                                <i class="bi bi-check2-all text-info" title="Read"></i>
+                                            {% else %}
+                                                <i class="bi bi-check2" title="Sent"></i>
+                                            {% endif %}
+                                        </span>
+                                    {% endif %}
+                                    {% if message.is_edited %}
+                                        <span class="opacity-50">(edited)</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- Message reactions -->
+                            <div class="message-reactions">
+                                <button class="reaction-btn" onclick="addReaction({{ message.id }}, '👍')">👍</button>
+                                <button class="reaction-btn" onclick="addReaction({{ message.id }}, '❤️')">❤️</button>
+                                <button class="reaction-btn" onclick="addReaction({{ message.id }}, '😂')">😂</button>
+                                <button class="reaction-btn" onclick="addReaction({{ message.id }}, '😮')">😮</button>
+                                <button class="reaction-btn" onclick="addReaction({{ message.id }}, '😢')">😢</button>
+                                <button class="reaction-btn" onclick="addReaction({{ message.id }}, '🔥')">🔥</button>
+                                {% if message.sender != request.user %}
+                                    <button class="btn btn-link btn-sm p-0 ms-2" onclick="replyToMessage({{ message.id }}, '{{ message.content|truncatechars:30|escapejs }}', '{{ message.sender.username }}')">
+                                        <i class="bi bi-reply"></i>
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="text-center py-5">
+                            <i class="bi bi-chat-heart text-muted" style="font-size: 4rem;"></i>
+                            <h5 class="text-muted mt-3">Start the conversation!</h5>
+                            <p class="text-muted">Send a message to begin chatting.</p>
+                        </div>
+                    {% endfor %}
+                    
+                    <!-- Typing indicator -->
+                    <div class="typing-indicator" id="typingIndicator">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-light rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
+                                <i class="bi bi-person text-muted"></i>
+                            </div>
+                            <div class="bg-light p-2 rounded">
+                                <span class="typing-dots"></span>
+                                <span class="typing-dots"></span>
+                                <span class="typing-dots"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Input -->
+                <div class="chat-input-container">
+                    <form method="post" enctype="multipart/form-data" id="messageForm">
+                        {% csrf_token %}
+                        
+                        <!-- Reply preview -->
+                        <div id="replyPreview" class="reply-to-message" style="display: none;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="bi bi-reply me-2"></i>
+                                    <span id="replyToUser"></span>: <span id="replyToContent"></span>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-link p-0" onclick="cancelReply()">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- File preview area -->
+                        <div id="filePreview" class="mb-2"></div>
+                        
+                        <div class="input-group">
+                            <!-- Emoji picker button -->
+                            <button type="button" class="btn btn-outline-secondary" onclick="toggleEmojiPicker()">
+                                <i class="bi bi-emoji-smile"></i>
+                            </button>
+                            
+                            <!-- Message input -->
+                            <div class="position-relative flex-grow-1">
+                                {{ form.content }}
+                                
+                                <!-- Emoji picker -->
+                                <div class="emoji-picker" id="emojiPicker">
+                                    <div class="emoji-grid">
+                                        <span class="emoji" onclick="insertEmoji('😀')">😀</span>
+                                        <span class="emoji" onclick="insertEmoji('😃')">😃</span>
+                                        <span class="emoji" onclick="insertEmoji('😄')">😄</span>
+                                        <span class="emoji" onclick="insertEmoji('😁')">😁</span>
+                                        <span class="emoji" onclick="insertEmoji('😅')">😅</span>
+                                        <span class="emoji" onclick="insertEmoji('😂')">😂</span>
+                                        <span class="emoji" onclick="insertEmoji('🤣')">🤣</span>
+                                        <span class="emoji" onclick="insertEmoji('😊')">😊</span>
+                                        <span class="emoji" onclick="insertEmoji('😇')">😇</span>
+                                        <span class="emoji" onclick="insertEmoji('🙂')">🙂</span>
+                                        <span class="emoji" onclick="insertEmoji('🙃')">🙃</span>
+                                        <span class="emoji" onclick="insertEmoji('😉')">😉</span>
+                                        <span class="emoji" onclick="insertEmoji('😌')">😌</span>
+                                        <span class="emoji" onclick="insertEmoji('😍')">😍</span>
+                                        <span class="emoji" onclick="insertEmoji('🥰')">🥰</span>
+                                        <span class="emoji" onclick="insertEmoji('😘')">😘</span>
+                                        <span class="emoji" onclick="insertEmoji('😗')">😗</span>
+                                        <span class="emoji" onclick="insertEmoji('😙')">😙</span>
+                                        <span class="emoji" onclick="insertEmoji('😚')">😚</span>
+                                        <span class="emoji" onclick="insertEmoji('🤗')">🤗</span>
+                                        <span class="emoji" onclick="insertEmoji('🤩')">🤩</span>
+                                        <span class="emoji" onclick="insertEmoji('🤔')">🤔</span>
+                                        <span class="emoji" onclick="insertEmoji('🤨')">🤨</span>
+                                        <span class="emoji" onclick="insertEmoji('😐')">😐</span>
+                                        <span class="emoji" onclick="insertEmoji('😑')">😑</span>
+                                        <span class="emoji" onclick="insertEmoji('😶')">😶</span>
+                                        <span class="emoji" onclick="insertEmoji('😏')">😏</span>
+                                        <span class="emoji" onclick="insertEmoji('😒')">😒</span>
+                                        <span class="emoji" onclick="insertEmoji('🙄')">🙄</span>
+                                        <span class="emoji" onclick="insertEmoji('😬')">😬</span>
+                                        <span class="emoji" onclick="insertEmoji('🤥')">🤥</span>
+                                        <span class="emoji" onclick="insertEmoji('😔')">😔</span>
+                                        <span class="emoji" onclick="insertEmoji('😪')">😪</span>
+                                        <span class="emoji" onclick="insertEmoji('🤤')">🤤</span>
+                                        <span class="emoji" onclick="insertEmoji('😴')">😴</span>
+                                        <span class="emoji" onclick="insertEmoji('😷')">😷</span>
+                                        <span class="emoji" onclick="insertEmoji('🤒')">🤒</span>
+                                        <span class="emoji" onclick="insertEmoji('🤕')">🤕</span>
+                                        <span class="emoji" onclick="insertEmoji('🤢')">🤢</span>
+                                        <span class="emoji" onclick="insertEmoji('🤮')">🤮</span>
+                                        <span class="emoji" onclick="insertEmoji('🤧')">🤧</span>
+                                        <span class="emoji" onclick="insertEmoji('🥵')">🥵</span>
+                                        <span class="emoji" onclick="insertEmoji('🥶')">🥶</span>
+                                        <span class="emoji" onclick="insertEmoji('🥴')">🥴</span>
+                                        <span class="emoji" onclick="insertEmoji('😵')">😵</span>
+                                        <span class="emoji" onclick="insertEmoji('🤯')">🤯</span>
+                                        <span class="emoji" onclick="insertEmoji('🤠')">🤠</span>
+                                        <span class="emoji" onclick="insertEmoji('🥳')">🥳</span>
+                                        <span class="emoji" onclick="insertEmoji('😎')">😎</span>
+                                        <span class="emoji" onclick="insertEmoji('🤓')">🤓</span>
+                                        <span class="emoji" onclick="insertEmoji('🧐')">🧐</span>
+                                        <span class="emoji" onclick="insertEmoji('😕')">😕</span>
+                                        <span class="emoji" onclick="insertEmoji('😟')">😟</span>
+                                        <span class="emoji" onclick="insertEmoji('🙁')">🙁</span>
+                                        <span class="emoji" onclick="insertEmoji('☹️')">☹️</span>
+                                        <span class="emoji" onclick="insertEmoji('😮')">😮</span>
+                                        <span class="emoji" onclick="insertEmoji('😯')">😯</span>
+                                        <span class="emoji" onclick="insertEmoji('😲')">😲</span>
+                                        <span class="emoji" onclick="insertEmoji('😳')">😳</span>
+                                        <span class="emoji" onclick="insertEmoji('🥺')">🥺</span>
+                                        <span class="emoji" onclick="insertEmoji('😦')">😦</span>
+                                        <span class="emoji" onclick="insertEmoji('😧')">😧</span>
+                                        <span class="emoji" onclick="insertEmoji('😨')">😨</span>
+                                        <span class="emoji" onclick="insertEmoji('😰')">😰</span>
+                                        <span class="emoji" onclick="insertEmoji('😥')">😥</span>
+                                        <span class="emoji" onclick="insertEmoji('😢')">😢</span>
+                                        <span class="emoji" onclick="insertEmoji('😭')">😭</span>
+                                        <span class="emoji" onclick="insertEmoji('😱')">😱</span>
+                                        <span class="emoji" onclick="insertEmoji('😖')">😖</span>
+                                        <span class="emoji" onclick="insertEmoji('😣')">😣</span>
+                                        <span class="emoji" onclick="insertEmoji('😞')">😞</span>
+                                        <span class="emoji" onclick="insertEmoji('😓')">😓</span>
+                                        <span class="emoji" onclick="insertEmoji('😩')">😩</span>
+                                        <span class="emoji" onclick="insertEmoji('😫')">😫</span>
+                                        <span class="emoji" onclick="insertEmoji('🥱')">🥱</span>
+                                        <span class="emoji" onclick="insertEmoji('😤')">😤</span>
+                                        <span class="emoji" onclick="insertEmoji('😡')">😡</span>
+                                        <span class="emoji" onclick="insertEmoji('😠')">😠</span>
+                                        <span class="emoji" onclick="insertEmoji('🤬')">🤬</span>
+                                        <span class="emoji" onclick="insertEmoji('👍')">👍</span>
+                                        <span class="emoji" onclick="insertEmoji('👎')">👎</span>
+                                        <span class="emoji" onclick="insertEmoji('👌')">👌</span>
+                                        <span class="emoji" onclick="insertEmoji('✌️')">✌️</span>
+                                        <span class="emoji" onclick="insertEmoji('🤞')">🤞</span>
+                                        <span class="emoji" onclick="insertEmoji('🤟')">🤟</span>
+                                        <span class="emoji" onclick="insertEmoji('🤘')">🤘</span>
+                                        <span class="emoji" onclick="insertEmoji('🤙')">🤙</span>
+                                        <span class="emoji" onclick="insertEmoji('👈')">👈</span>
+                                        <span class="emoji" onclick="insertEmoji('👉')">👉</span>
+                                        <span class="emoji" onclick="insertEmoji('👆')">👆</span>
+                                        <span class="emoji" onclick="insertEmoji('🖕')">🖕</span>
+                                        <span class="emoji" onclick="insertEmoji('👇')">👇</span>
+                                        <span class="emoji" onclick="insertEmoji('☝️')">☝️</span>
+                                        <span class="emoji" onclick="insertEmoji('👏')">👏</span>
+                                        <span class="emoji" onclick="insertEmoji('🙌')">🙌</span>
+                                        <span class="emoji" onclick="insertEmoji('👐')">👐</span>
+                                        <span class="emoji" onclick="insertEmoji('🤲')">🤲</span>
+                                        <span class="emoji" onclick="insertEmoji('🤝')">🤝</span>
+                                        <span class="emoji" onclick="insertEmoji('🙏')">🙏</span>
+                                        <span class="emoji" onclick="insertEmoji('❤️')">❤️</span>
+                                        <span class="emoji" onclick="insertEmoji('💙')">💙</span>
+                                        <span class="emoji" onclick="insertEmoji('💚')">💚</span>
+                                        <span class="emoji" onclick="insertEmoji('💛')">💛</span>
+                                        <span class="emoji" onclick="insertEmoji('🧡')">🧡</span>
+                                        <span class="emoji" onclick="insertEmoji('💜')">💜</span>
+                                        <span class="emoji" onclick="insertEmoji('🖤')">🖤</span>
+                                        <span class="emoji" onclick="insertEmoji('🤍')">🤍</span>
+                                        <span class="emoji" onclick="insertEmoji('🤎')">🤎</span>
+                                        <span class="emoji" onclick="insertEmoji('💔')">💔</span>
+                                        <span class="emoji" onclick="insertEmoji('❣️')">❣️</span>
+                                        <span class="emoji" onclick="insertEmoji('💕')">💕</span>
+                                        <span class="emoji" onclick="insertEmoji('💞')">💞</span>
+                                        <span class="emoji" onclick="insertEmoji('💓')">💓</span>
+                                        <span class="emoji" onclick="insertEmoji('💗')">💗</span>
+                                        <span class="emoji" onclick="insertEmoji('💖')">💖</span>
+                                        <span class="emoji" onclick="insertEmoji('💘')">💘</span>
+                                        <span class="emoji" onclick="insertEmoji('💝')">💝</span>
+                                        <span class="emoji" onclick="insertEmoji('💟')">💟</span>
+                                        <span class="emoji" onclick="insertEmoji('🔥')">🔥</span>
+                                        <span class="emoji" onclick="insertEmoji('💯')">💯</span>
+                                        <span class="emoji" onclick="insertEmoji('💢')">💢</span>
+                                        <span class="emoji" onclick="insertEmoji('💥')">💥</span>
+                                        <span class="emoji" onclick="insertEmoji('💫')">💫</span>
+                                        <span class="emoji" onclick="insertEmoji('💦')">💦</span>
+                                        <span class="emoji" onclick="insertEmoji('💨')">💨</span>
+                                        <span class="emoji" onclick="insertEmoji('🕳️')">🕳️</span>
+                                        <span class="emoji" onclick="insertEmoji('💬')">💬</span>
+                                        <span class="emoji" onclick="insertEmoji('👁️‍🗨️')">👁️‍🗨️</span>
+                                        <span class="emoji" onclick="insertEmoji('🗨️')">🗨️</span>
+                                        <span class="emoji" onclick="insertEmoji('🗯️')">🗯️</span>
+                                        <span class="emoji" onclick="insertEmoji('💭')">💭</span>
+                                        <span class="emoji" onclick="insertEmoji('💤')">💤</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Attachment buttons -->
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-outline-secondary" onclick="triggerFileInput('image')" title="Send Image">
+                                    <i class="bi bi-image"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="triggerFileInput('video')" title="Send Video">
+                                    <i class="bi bi-camera-video"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="triggerFileInput('audio')" title="Send Audio">
+                                    <i class="bi bi-mic"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="triggerFileInput('file')" title="Send File">
+                                    <i class="bi bi-paperclip"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- Send button -->
+                            <button type="submit" class="btn btn-primary" id="sendBtn">
+                                <i class="bi bi-send"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Hidden file inputs -->
+                        <div class="d-none">
+                            {{ form.image }}
+                            {{ form.video }}
+                            {{ form.audio }}
+                            {{ form.file }}
+                        </div>
+                        
+                        <!-- Hidden reply field -->
+                        <input type="hidden" id="replyToId" name="reply_to" value="">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Image Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Image Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" alt="Image" class="img-fluid">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-scroll to bottom on page load
+document.addEventListener('DOMContentLoaded', function() {
+    scrollToBottom();
+});
+
+function scrollToBottom() {
+    const container = document.getElementById('messagesContainer');
+    container.scrollTop = container.scrollHeight;
+}
+
+// Enhanced file handling
+function triggerFileInput(type) {
+    document.getElementById(`id_${type}`).click();
+}
+
+// File preview functionality
+['image', 'video', 'audio', 'file'].forEach(type => {
+    document.getElementById(`id_${type}`).addEventListener('change', function(e) {
+        handleFilePreview(e.target.files[0], type);
+    });
+});
+
+function handleFilePreview(file, type) {
+    const preview = document.getElementById('filePreview');
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            let previewHTML = '';
+            
+            if (type === 'image') {
+                previewHTML = `
+                    <div class="d-flex align-items-center p-2 bg-light rounded">
+                        <img src="${e.target.result}" alt="Preview" class="me-2" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;">
+                        <div class="flex-grow-1">
+                            <strong>Image:</strong> ${file.name}
+                            <br><small class="text-muted">${(file.size / 1024 / 1024).toFixed(2)} MB</small>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="clearFilePreview()">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </div>
+                `;
+            } else if (type === 'video') {
+                previewHTML = `
+                    <div class="d-flex align-items-center p-2 bg-light rounded">
+                        <div class="me-2 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; background: #007bff; color: white; border-radius: 5px;">
+                            <i class="bi bi-camera-video"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <strong>Video:</strong> ${file.name}
+                            <br><small class="text-muted">${(file.size / 1024 / 1024).toFixed(2)} MB</small>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="clearFilePreview()">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </div>
+                `;
+            } else if (type === 'audio') {
+                previewHTML = `
+                    <div class="d-flex align-items-center p-2 bg-light rounded">
+                        <div class="me-2 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; background: #28a745; color: white; border-radius: 5px;">
+                            <i class="bi bi-music-note-beamed"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <strong>Audio:</strong> ${file.name}
+                            <br><small class="text-muted">${(file.size / 1024 / 1024).toFixed(2)} MB</small>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="clearFilePreview()">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </div>
+                `;
+            } else {
+                previewHTML = `
+                    <div class="d-flex align-items-center p-2 bg-light rounded">
+                        <div class="me-2 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; background: #6c757d; color: white; border-radius: 5px;">
+                            <i class="bi bi-file-earmark"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <strong>File:</strong> ${file.name}
+                            <br><small class="text-muted">${(file.size / 1024 / 1024).toFixed(2)} MB</small>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="clearFilePreview()">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </div>
+                `;
+            }
+            
+            preview.innerHTML = previewHTML;
+        };
+        
+        if (type === 'image') {
+            reader.readAsDataURL(file);
+        } else {
+            // For non-image files, just show the preview without reading the file
+            preview.innerHTML = `
+                <div class="d-flex align-items-center p-2 bg-light rounded">
+                    <div class="me-2 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; background: #6c757d; color: white; border-radius: 5px;">
+                        <i class="bi bi-${type === 'video' ? 'camera-video' : type === 'audio' ? 'music-note-beamed' : 'file-earmark'}"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <strong>${type.charAt(0).toUpperCase() + type.slice(1)}:</strong> ${file.name}
+                        <br><small class="text-muted">${(file.size / 1024 / 1024).toFixed(2)} MB</small>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="clearFilePreview()">
+                        <i class="bi bi-x"></i>
+                    </button>
+                </div>
+            `;
+        }
+    }
+}
+
+function clearFilePreview() {
+    document.getElementById('filePreview').innerHTML = '';
+    // Clear all file inputs
+    ['image', 'video', 'audio', 'file'].forEach(type => {
+        document.getElementById(`id_${type}`).value = '';
+    });
+}
+
+// Emoji picker functionality
+function toggleEmojiPicker() {
+    const picker = document.getElementById('emojiPicker');
+    picker.style.display = picker.style.display === 'none' || picker.style.display === '' ? 'block' : 'none';
+}
+
+function insertEmoji(emoji) {
+    const textarea = document.getElementById('id_content');
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    
+    textarea.value = text.substring(0, start) + emoji + text.substring(end);
+    textarea.selectionStart = textarea.selectionEnd = start + emoji.length;
+    textarea.focus();
+    
+    // Hide emoji picker
+    document.getElementById('emojiPicker').style.display = 'none';
+}
+
+// Close emoji picker when clicking outside
+document.addEventListener('click', function(e) {
+    const picker = document.getElementById('emojiPicker');
+    const button = e.target.closest('button[onclick="toggleEmojiPicker()"]');
+    const emoji = e.target.closest('.emoji');
+    
+    if (!button && !emoji && !picker.contains(e.target)) {
+        picker.style.display = 'none';
+    }
+});
+
+// Reply functionality
+function replyToMessage(messageId, content, username) {
+    document.getElementById('replyToId').value = messageId;
+    document.getElementById('replyToUser').textContent = username;
+    document.getElementById('replyToContent').textContent = content;
+    document.getElementById('replyPreview').style.display = 'block';
+    document.getElementById('id_content').focus();
+}
+
+function cancelReply() {
+    document.getElementById('replyToId').value = '';
+    document.getElementById('replyPreview').style.display = 'none';
+}
+
+// Send on Enter (but not Shift+Enter)
+document.getElementById('id_content').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        document.getElementById('messageForm').submit();
+    }
+});
+
+// Message reactions (placeholder for future AJAX implementation)
+function addReaction(messageId, emoji) {
+    // This would typically be an AJAX call to the server
+    console.log(`Adding reaction ${emoji} to message ${messageId}`);
+    // For now, just show a visual feedback
+    event.target.classList.add('active');
+    setTimeout(() => event.target.classList.remove('active'), 1000);
+}
+
+// Image modal functionality
+function openImageModal(imageUrl) {
+    document.getElementById('modalImage').src = imageUrl;
+    new bootstrap.Modal(document.getElementById('imageModal')).show();
+}
+
+// Conversation search functionality
+document.getElementById('conversationSearch').addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const conversations = document.querySelectorAll('.conversation-item');
+    
+    conversations.forEach(conversation => {
+        const text = conversation.textContent.toLowerCase();
+        if (text.includes(searchTerm)) {
+            conversation.style.display = 'block';
+        } else {
+            conversation.style.display = 'none';
+        }
+    });
+});
+
+// Auto-resize textarea
+document.getElementById('id_content').addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+});
+
+// Typing indicator simulation (for demo purposes)
+let typingTimer;
+document.getElementById('id_content').addEventListener('input', function() {
+    clearTimeout(typingTimer);
+    
+    // In a real app, you would send a "typing" event via WebSocket
+    // document.getElementById('typingIndicator').style.display = 'block';
+    
+    typingTimer = setTimeout(() => {
+        // document.getElementById('typingIndicator').style.display = 'none';
+    }, 1000);
+});
+
+// Refresh messages every 30 seconds (simple polling - in production, use WebSockets)
+setInterval(() => {
+    // In a real app, you would fetch new messages via AJAX
+    console.log('Checking for new messages...');
+}, 30000);
+</script>
+
+{% endblock %}

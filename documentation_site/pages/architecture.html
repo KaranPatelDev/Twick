@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architecture - Twick Documentation</title>
+    <meta name="description" content="Detailed architecture documentation for Twick social media platform">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="../assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="../index.html">
+                Twick Docs
+            </a>
+            
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="architecture.html">Architecture</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="api-reference.html">API Reference</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="containerization.html">Containerization</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Content -->
+    <section class="section" style="padding-top: 120px;">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="sidebar">
+                        <h4>Architecture</h4>
+                        <ul class="sidebar-nav">
+                            <li><a href="#overview" class="active">System Overview</a></li>
+                            <li><a href="#models">Data Models</a></li>
+                            <li><a href="#views">View Architecture</a></li>
+                            <li><a href="#templates">Template System</a></li>
+                            <li><a href="#static">Static Files</a></li>
+                            <li><a href="#database">Database Design</a></li>
+                            <li><a href="#security">Security</a></li>
+                            <li><a href="#performance">Performance</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="col-lg-9">
+                    <h1>System Architecture</h1>
+                    <p class="lead">Comprehensive overview of Twick's architecture, design patterns, and technical implementation.</p>
+                    
+                    <!-- System Overview -->
+                    <section id="overview" class="mb-5">
+                        <h2>System Overview</h2>
+                        <p>Twick follows Django's Model-View-Template (MVT) architecture pattern with additional layers for enhanced functionality.</p>
+                        
+                        <div class="card">
+                            <div class="card-body">
+                                <h4>Architecture Layers</h4>
+                                <div class="table-container">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Layer</th>
+                                                <th>Technology</th>
+                                                <th>Purpose</th>
+                                                <th>Location</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Presentation</td>
+                                                <td>HTML5, CSS3, Bootstrap 5, JavaScript</td>
+                                                <td>User Interface</td>
+                                                <td><code>templates/</code>, <code>static/</code></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Application</td>
+                                                <td>Django Views, Forms, URLs</td>
+                                                <td>Business Logic</td>
+                                                <td><code>tweet/views.py</code>, <code>tweet/forms.py</code></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Data Access</td>
+                                                <td>Django ORM, Models</td>
+                                                <td>Data Management</td>
+                                                <td><code>tweet/models.py</code></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Database</td>
+                                                <td>SQLite/PostgreSQL</td>
+                                                <td>Data Storage</td>
+                                                <td><code>db.sqlite3</code></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <!-- Data Models -->
+                    <section id="models" class="mb-5">
+                        <h2>Data Models</h2>
+                        <p>Core data models that power the Twick platform.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h4 class="card-title">User Management Models</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul>
+                                            <li><strong>User</strong> - Django's built-in user model</li>
+                                            <li><strong>UserProfile</strong> - Extended user information</li>
+                                            <li><strong>Follow</strong> - User follow relationships</li>
+                                            <li><strong>FollowRequest</strong> - Pending follow requests</li>
+                                            <li><strong>Block</strong> - Blocked users</li>
+                                            <li><strong>Mute</strong> - Muted users</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h4 class="card-title">Content Models</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul>
+                                            <li><strong>Tweet</strong> - Main tweet content</li>
+                                            <li><strong>TweetReply</strong> - Tweet replies</li>
+                                            <li><strong>Comment</strong> - Tweet comments</li>
+                                            <li><strong>Hashtag</strong> - Hashtag management</li>
+                                            <li><strong>TweetHashtag</strong> - Tweet-hashtag relations</li>
+                                            <li><strong>Like</strong> - Tweet likes</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="code-block mt-4">
+                            <div class="code-header">
+                                <span class="code-lang">python</span>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            <div class="code-content">
+# Key Model Relationships Example
+class Tweet(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tweets')
+    text = models.TextField(max_length=280)
+    image = models.ImageField(upload_to='photos/', blank=True, null=True)
+    privacy = models.CharField(max_length=10, choices=PRIVACY_CHOICES, default='public')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user']),
+            models.Index(fields=['created_at']),
+            models.Index(fields=['privacy']),
+        ]
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    bio = models.TextField(max_length=500, blank=True)
+    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
+    cover_photo = models.ImageField(upload_to='covers/', blank=True, null=True)
+    is_private = models.BooleanField(default=False)
+    followers = models.ManyToManyField(User, related_name='following', blank=True)
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <!-- View Architecture -->
+                    <section id="views" class="mb-5">
+                        <h2>View Architecture</h2>
+                        <p>Twick uses both function-based and class-based views organized by feature modules.</p>
+                        
+                        <div class="card">
+                            <div class="card-body">
+                                <h4>View Organization</h4>
+                                <div class="table-container">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Feature</th>
+                                                <th>View Type</th>
+                                                <th>Key Functions</th>
+                                                <th>Location</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Tweet Management</td>
+                                                <td>Function-based</td>
+                                                <td>tweet_list, tweet_create, tweet_edit</td>
+                                                <td><code>views.py:50-200</code></td>
+                                            </tr>
+                                            <tr>
+                                                <td>User Authentication</td>
+                                                <td>Class-based</td>
+                                                <td>LoginView, RegisterView</td>
+                                                <td><code>views.py:1-50</code></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Social Features</td>
+                                                <td>Function-based</td>
+                                                <td>follow_user, like_tweet</td>
+                                                <td><code>views.py:200-400</code></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Messaging</td>
+                                                <td>Function-based</td>
+                                                <td>conversation_list, send_message</td>
+                                                <td><code>views.py:500-600</code></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info mt-3">
+                            <i class="bi bi-info-circle"></i>
+                            <strong>Design Pattern:</strong> Views follow the single responsibility principle with separate functions for each major operation.
+                        </div>
+                    </section>
+                    
+                    <!-- Template System -->
+                    <section id="templates" class="mb-5">
+                        <h2>Template System</h2>
+                        <p>Twick uses Django's template engine with custom template tags and filters for enhanced functionality.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h4 class="card-title">Template Structure</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul>
+                                            <li><strong>Base Template:</strong> <code>layout.html</code> - Main layout</li>
+                                            <li><strong>Home Page:</strong> <code>home.html</code> - Tweet feed</li>
+                                            <li><strong>Profile Pages:</strong> <code>user_profile.html</code>, <code>edit_profile.html</code></li>
+                                            <li><strong>Authentication:</strong> <code>registration/</code> folder</li>
+                                            <li><strong>Components:</strong> <code>components/</code> folder</li>
+                                            <li><strong>Tweet Templates:</strong> In <code>tweet/templates/</code></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h4 class="card-title">Template Features</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul>
+                                            <li><strong>Custom Template Tags:</strong> tweet_tags</li>
+                                            <li><strong>Template Inheritance:</strong> Extends base layout</li>
+                                            <li><strong>Include Components:</strong> Reusable UI parts</li>
+                                            <li><strong>Context Processors:</strong> Global template variables</li>
+                                            <li><strong>Template Caching:</strong> Fragment caching</li>
+                                            <li><strong>CSRF Protection:</strong> Built-in security</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="code-block mt-4">
+                            <div class="code-header">
+                                <span class="code-lang">html</span>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            <div class="code-content">
+<!-- Base Template Structure (layout.html) -->
+{% load static %}
+{% load tweet_tags %}
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;{% block title %}Twick{% endblock %}&lt;/title&gt;
+    &lt;link rel="stylesheet" href="{% static 'css/custom.css' %}"&gt;
+    &lt;link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    {% include 'components/twick_logo.html' %}
+    
+    &lt;main class="container mt-4"&gt;
+        {% block content %}
+        {% endblock %}
+    &lt;/main&gt;
+    
+    &lt;script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"&gt;&lt;/script&gt;
+    {% block extra_js %}{% endblock %}
+&lt;/body&gt;
+&lt;/html&gt;
+
+<!-- Custom Template Tag Usage -->
+{% load tweet_tags %}
+{% user_tweets user as user_tweet_list %}
+{% for tweet in user_tweet_list %}
+    {% include 'tweet/tweet_card.html' with tweet=tweet %}
+{% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info mt-3">
+                            <i class="bi bi-info-circle"></i>
+                            <strong>Template Organization:</strong> Templates are organized by app in their respective templates directories, with shared components in the main templates folder.
+                        </div>
+                    </section>
+                    
+                    <!-- Static Files -->
+                    <section id="static" class="mb-5">
+                        <h2>Static Files</h2>
+                        <p>Static files management including CSS, JavaScript, images, and media uploads with proper organization and optimization.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h4 class="card-title">Static Files Structure</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul>
+                                            <li><strong>CSS:</strong> <code>static/css/custom.css</code></li>
+                                            <li><strong>Images:</strong> <code>static/images/</code></li>
+                                            <li><strong>Favicon:</strong> <code>static/images/favicon.svg</code></li>
+                                            <li><strong>Collected Static:</strong> <code>staticfiles/</code></li>
+                                            <li><strong>Admin Static:</strong> <code>staticfiles/admin/</code></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h4 class="card-title">Media Files Structure</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul>
+                                            <li><strong>User Avatars:</strong> <code>media/avatars/</code></li>
+                                            <li><strong>Cover Photos:</strong> <code>media/covers/</code></li>
+                                            <li><strong>Tweet Photos:</strong> <code>media/photos/</code></li>
+                                            <li><strong>DM Files:</strong> <code>media/dm_files/</code></li>
+                                            <li><strong>DM Images:</strong> <code>media/dm_images/</code></li>
+                                            <li><strong>DM Videos:</strong> <code>media/dm_videos/</code></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card mt-4">
+                            <div class="card-body">
+                                <h4>Static Files Configuration</h4>
+                                <p>Django static files settings for development and production:</p>
+                                
+                                <div class="code-block">
+                                    <div class="code-header">
+                                        <span class="code-lang">python</span>
+                                        <button class="copy-btn">Copy</button>
+                                    </div>
+                                    <div class="code-content">
+# Static files settings (settings.py)
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
+# Media files settings
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Static files finders
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+]
+
+# For production deployment
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h4 class="card-title">Static Files Best Practices</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul>
+                                            <li>Use <code>{% load static %}</code> in templates</li>
+                                            <li>Organize by file type (css/, js/, images/)</li>
+                                            <li>Use meaningful file names</li>
+                                            <li>Optimize images for web</li>
+                                            <li>Use CDN for production</li>
+                                            <li>Enable compression</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h4 class="card-title">File Upload Security</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul>
+                                            <li>File type validation</li>
+                                            <li>File size limits</li>
+                                            <li>Image processing and resizing</li>
+                                            <li>Virus scanning (production)</li>
+                                            <li>Secure file naming</li>
+                                            <li>Media URL protection</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-warning mt-3">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <strong>Production Note:</strong> In production, static files should be served by a web server (nginx/Apache) or CDN for better performance.
+                        </div>
+                    </section>
+                    
+                    <!-- Database Design -->
+                    <section id="database" class="mb-5">
+                        <h2>Database Design</h2>
+                        <p>Optimized database schema with proper indexing and relationships.</p>
+                        
+                        <div class="card">
+                            <div class="card-body">
+                                <h4>Database Optimization</h4>
+                                <ul>
+                                    <li><strong>Indexes:</strong> Strategic indexing on frequently queried fields</li>
+                                    <li><strong>Foreign Keys:</strong> Proper relationships with CASCADE and PROTECT</li>
+                                    <li><strong>Constraints:</strong> Unique constraints for data integrity</li>
+                                    <li><strong>Migrations:</strong> Version-controlled schema changes</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="code-block mt-4">
+                            <div class="code-header">
+                                <span class="code-lang">sql</span>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            <div class="code-content">
+-- Key Database Indexes for Performance
+CREATE INDEX tweet_user_id_idx ON tweet_tweet(user_id);
+CREATE INDEX tweet_created_at_idx ON tweet_tweet(created_at);
+CREATE INDEX tweet_privacy_idx ON tweet_tweet(privacy);
+CREATE INDEX follow_follower_following_idx ON tweet_follow(follower_id, following_id);
+CREATE INDEX notification_recipient_unread_idx ON tweet_notification(recipient_id, is_read);
+
+-- Unique Constraints
+ALTER TABLE tweet_follow ADD CONSTRAINT unique_follow 
+    UNIQUE(follower_id, following_id);
+ALTER TABLE tweet_block ADD CONSTRAINT unique_block 
+    UNIQUE(blocker_id, blocked_id);
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <!-- Security -->
+                    <section id="security" class="mb-5">
+                        <h2>Security Implementation</h2>
+                        <p>Multi-layered security approach protecting against common vulnerabilities.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h4 class="card-title">Built-in Protections</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul>
+                                            <li>CSRF Protection</li>
+                                            <li>SQL Injection Prevention</li>
+                                            <li>XSS Protection</li>
+                                            <li>Clickjacking Protection</li>
+                                            <li>HTTPS Enforcement</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h4 class="card-title">Custom Security Features</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul>
+                                            <li>Rate Limiting</li>
+                                            <li>Input Validation</li>
+                                            <li>File Upload Security</li>
+                                            <li>Privacy Controls</li>
+                                            <li>Session Management</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <!-- Performance -->
+                    <section id="performance" class="mb-5">
+                        <h2>Performance Optimization</h2>
+                        <p>Techniques used to ensure fast response times and scalability.</p>
+                        
+                        <div class="card">
+                            <div class="card-body">
+                                <h4>Optimization Strategies</h4>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <h5>Database Level</h5>
+                                        <ul>
+                                            <li>Query optimization</li>
+                                            <li>Selective field loading</li>
+                                            <li>Prefetch related objects</li>
+                                            <li>Database connection pooling</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h5>Application Level</h5>
+                                        <ul>
+                                            <li>Template caching</li>
+                                            <li>AJAX for dynamic content</li>
+                                            <li>Pagination</li>
+                                            <li>Lazy loading</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h5>Frontend Level</h5>
+                                        <ul>
+                                            <li>CSS/JS minification</li>
+                                            <li>Image optimization</li>
+                                            <li>CDN integration</li>
+                                            <li>Browser caching</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="code-block mt-4">
+                            <div class="code-header">
+                                <span class="code-lang">python</span>
+                                <button class="copy-btn">Copy</button>
+                            </div>
+                            <div class="code-content">
+# Performance Optimization Examples
+def get_user_feed(user, limit=50):
+    """Optimized feed query with prefetch_related"""
+    return Tweet.objects.filter(
+        Q(user__in=following) | Q(user=user)
+    ).exclude(
+        Q(user__in=blocked_users) | Q(user__in=muted_users)
+    ).select_related('user').prefetch_related(
+        'likes', 'hashtag_relations__hashtag'
+    ).order_by('-created_at')[:limit]
+
+# Template fragment caching
+{% load cache %}
+{% cache 300 tweet_detail tweet.id %}
+    {% include 'components/tweet_card.html' %}
+{% endcache %}
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="text-center">
+                <p>&copy; 2024 Twick Documentation. Built with ❤️ for the Django community.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/main.js"></script>
+</body>
+</html>

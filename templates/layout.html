@@ -1,0 +1,603 @@
+{% load static %}
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+    <style>
+        :root {
+            --primary-color: #1DA1F2;
+            --secondary-color: #14171A;
+            --accent-color: #657786;
+            --background-color: #F7F9FA;
+            --card-background: #FFFFFF;
+        }
+        
+        body {
+            background-color: var(--background-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--primary-color) !important;
+        }
+        
+        .tweet-card {
+            background: var(--card-background);
+            border: 1px solid #e1e8ed;
+            border-radius: 16px;
+            transition: all 0.2s ease-in-out;
+            margin-bottom: 1rem;
+        }
+        
+        .tweet-card:hover {
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            transform: translateY(-1px);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            border-radius: 20px;
+            font-weight: 600;
+            padding: 8px 20px;
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .like-btn {
+            border: none;
+            background: none;
+            color: var(--accent-color);
+            transition: color 0.2s;
+        }
+        
+        .like-btn:hover, .like-btn.liked {
+            color: #e91e63;
+        }
+        
+        .profile-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .sidebar {
+            background: var(--card-background);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #e1e8ed;
+        }
+        
+        .nav-pills .nav-link {
+            border-radius: 20px;
+            color: var(--secondary-color);
+            font-weight: 500;
+        }
+        
+        .nav-pills .nav-link.active {
+            background-color: var(--primary-color);
+        }
+        
+        .form-control {
+            border-radius: 12px;
+            border: 2px solid #e1e8ed;
+            padding: 12px 16px;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(29, 161, 242, 0.25);
+        }
+        
+        .alert {
+            border-radius: 12px;
+            border: none;
+        }
+    </style>
+    <title>
+        {% block title %}Twick - Twitter Clone{% endblock %}
+    </title>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top border-bottom">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <svg width="32" height="32" viewBox="0 0 100 100" class="me-2 twick-logo" style="fill: var(--primary-color);">
+                    <!-- Background circle for better visibility -->
+                    <circle cx="50" cy="50" r="48" fill="rgba(29, 161, 242, 0.1)" stroke="var(--primary-color)" stroke-width="1"/>
+                    
+                    <!-- Megaphone/Speaker representing freedom of speech -->
+                    <path d="M18 28 L42 28 L62 13 L82 13 L82 87 L62 87 L42 72 L18 72 Z" stroke="currentColor" stroke-width="2.5" fill="currentColor"/>
+                    
+                    <!-- Animated sound waves with gradient effect -->
+                    <defs>
+                        <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:currentColor;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:currentColor;stop-opacity:0.3" />
+                        </linearGradient>
+                    </defs>
+                    
+                    <path class="sound-wave" d="M72 22 Q85 32 85 50 Q85 68 72 78" stroke="url(#waveGradient)" stroke-width="2.5" fill="none"/>
+                    <path class="sound-wave" d="M77 27 Q87 35 87 50 Q87 65 77 73" stroke="url(#waveGradient)" stroke-width="2" fill="none"/>
+                    <path class="sound-wave" d="M82 32 Q90 40 90 50 Q90 60 82 68" stroke="url(#waveGradient)" stroke-width="1.5" fill="none"/>
+                    
+                    <!-- Voice opening with inner detail -->
+                    <circle cx="28" cy="50" r="8" fill="white" stroke="currentColor" stroke-width="1"/>
+                    <circle cx="28" cy="50" r="4" fill="var(--primary-color)" opacity="0.3"/>
+                    
+                    <!-- Dynamic speech particles -->
+                    <circle cx="48" cy="40" r="1.8" fill="currentColor" opacity="0.9">
+                        <animate attributeName="opacity" values="0.9;0.3;0.9" dur="2s" repeatCount="indefinite"/>
+                    </circle>
+                    <circle cx="54" cy="50" r="1.3" fill="currentColor" opacity="0.7">
+                        <animate attributeName="opacity" values="0.7;0.2;0.7" dur="2.5s" repeatCount="indefinite"/>
+                    </circle>
+                    <circle cx="58" cy="60" r="1.5" fill="currentColor" opacity="0.8">
+                        <animate attributeName="opacity" values="0.8;0.4;0.8" dur="1.8s" repeatCount="indefinite"/>
+                    </circle>
+                    
+                    <!-- Freedom star accent -->
+                    <path d="M35 25 L37 30 L42 30 L38 33 L40 38 L35 35 L30 38 L32 33 L28 30 L33 30 Z" fill="gold" opacity="0.8"/>
+                </svg>
+                <span style="background: linear-gradient(45deg, #1DA1F2, #1991DB); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; letter-spacing: -0.5px;">Twick</span>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home' %}">
+                            <i class="bi bi-house-fill me-1"></i> Home
+                        </a>
+                    </li>
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'personalized_feed' %}">
+                            <i class="bi bi-person-lines-fill me-1"></i> Feed
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'trending_hashtags' %}">
+                            <i class="bi bi-hash me-1"></i> Trending
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'search' %}">
+                            <i class="bi bi-search me-1"></i> Search
+                        </a>
+                    </li>
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link position-relative" href="{% url 'notifications_list' %}">
+                            <i class="bi bi-bell me-1"></i> Notifications
+                            {% notification_badge user %}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link position-relative" href="{% url 'conversations_list' %}">
+                            <i class="bi bi-envelope me-1"></i> Messages
+                            {% message_badge user %}
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+                
+                <!-- Search Form -->
+                <form class="d-flex me-3" method="GET" action="{% url 'search' %}">
+                    <input class="form-control" type="search" name="query" placeholder="Search everything..." 
+                           value="{{ request.GET.query }}" style="border-radius: 20px;">
+                    <button class="btn btn-outline-primary ms-2" type="submit">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </form>
+                
+                <!-- User Menu -->
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="btn btn-primary me-2" href="{% url 'tweet_create' %}">
+                            <i class="bi bi-plus-circle me-1"></i> Tweet
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" 
+                           role="button" data-bs-toggle="dropdown">
+                            {% if user.userprofile and user.userprofile.avatar %}
+                                <img src="{{ user.userprofile.avatar.url }}" alt="Avatar" class="profile-avatar me-2">
+                            {% else %}
+                                <i class="bi bi-person-circle fs-4 me-2"></i>
+                            {% endif %}
+                            {{ user.username }}
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'user_profile' user.username %}">
+                                <i class="bi bi-person me-2"></i>Profile
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'edit_profile' %}">
+                                <i class="bi bi-gear me-2"></i>Settings
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form method="post" action="{% url 'logout' %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="dropdown-item border-0 bg-transparent">
+                                        <i class="bi bi-box-arrow-right me-2"></i>Logout
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'register' %}">Sign Up</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <!-- CSRF Token for AJAX requests -->
+        {% csrf_token %}
+        
+        <!-- Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+        // Like tweet functionality
+        function likeTweet(tweetId) {
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+            if (!csrfToken) {
+                console.error('CSRF token not found');
+                return;
+            }
+            
+            fetch(`/tweet/${tweetId}/like/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken.value,
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const likeBtn = document.querySelector(`#like-btn-${tweetId}`);
+                const likeCount = document.querySelector(`#like-count-${tweetId}`);
+                
+                if (likeBtn && likeCount) {
+                    if (data.liked) {
+                        likeBtn.classList.add('liked');
+                        likeBtn.innerHTML = '<i class="bi bi-heart-fill"></i>';
+                    } else {
+                        likeBtn.classList.remove('liked');
+                        likeBtn.innerHTML = '<i class="bi bi-heart"></i>';
+                    }
+                    
+                    likeCount.textContent = data.likes_count;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+        
+        // Character counter for tweet form
+        document.addEventListener('DOMContentLoaded', function() {
+            const tweetTextarea = document.querySelector('textarea[name="text"]');
+            if (tweetTextarea) {
+                const counter = document.createElement('div');
+                counter.className = 'text-muted small mt-1';
+                counter.textContent = `0/280 characters`;
+                tweetTextarea.parentNode.appendChild(counter);
+                
+                tweetTextarea.addEventListener('input', function() {
+                    const length = this.value.length;
+                    counter.textContent = `${length}/280 characters`;
+                    counter.className = length > 280 ? 'text-danger small mt-1' : 'text-muted small mt-1';
+                });
+            }
+        });
+    </script>
+    
+    <script>
+        // New features JavaScript functions
+        
+        // Follow user functionality
+        function followUser(username) {
+            fetch(`/api/follow/${username}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    // Update follow button
+                    const followBtn = document.querySelector(`[onclick="followUser('${username}')"]`);
+                    if (followBtn) {
+                        if (data.action === 'followed') {
+                            followBtn.textContent = 'Following';
+                            followBtn.className = 'btn btn-primary btn-sm';
+                            followBtn.onclick = () => followUser(username);
+                        } else if (data.action === 'unfollowed') {
+                            followBtn.textContent = 'Follow';
+                            followBtn.className = 'btn btn-outline-primary btn-sm';
+                        } else if (data.action === 'requested') {
+                            followBtn.textContent = 'Requested';
+                            followBtn.className = 'btn btn-outline-secondary btn-sm';
+                        }
+                    }
+                    
+                    // Update followers count if visible
+                    const followersCount = document.querySelector('.followers-count');
+                    if (followersCount && data.followers_count !== undefined) {
+                        followersCount.textContent = data.followers_count;
+                    }
+                }
+            });
+        }
+        
+        // Block user functionality
+        function blockUser(username) {
+            if (confirm(`Are you sure you want to block @${username}?`)) {
+                fetch(`/api/block/${username}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        location.reload();
+                    } else {
+                        alert(data.error || 'An error occurred');
+                    }
+                });
+            }
+        }
+        
+        // Unblock user functionality
+        function unblockUser(username) {
+            fetch(`/api/unblock/${username}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert(data.error || 'An error occurred');
+                }
+            });
+        }
+        
+        // Mute user functionality
+        function muteUser(username) {
+            fetch(`/api/mute/${username}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert(data.error || 'An error occurred');
+                }
+            });
+        }
+        
+        // Unmute user functionality
+        function unmuteUser(username) {
+            fetch(`/api/unmute/${username}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert(data.error || 'An error occurred');
+                }
+            });
+        }
+        
+        // Enhanced like tweet functionality
+        function likeTweet(tweetId) {
+            fetch(`/tweet/${tweetId}/like/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const icon = document.getElementById(`like-icon-${tweetId}`);
+                const count = document.getElementById(`like-count-${tweetId}`);
+                
+                if (icon && count) {
+                    if (data.liked) {
+                        icon.classList.add('text-danger');
+                    } else {
+                        icon.classList.remove('text-danger');
+                    }
+                    count.textContent = data.likes_count;
+                }
+            });
+        }
+        
+        // Share tweet functionality
+        function shareTweet(tweetId) {
+            const url = `${window.location.origin}/tweet/${tweetId}/`;
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Check out this tweet on Twick',
+                    url: url
+                });
+            } else {
+                // Fallback to copying to clipboard
+                navigator.clipboard.writeText(url).then(() => {
+                    alert('Tweet link copied to clipboard!');
+                });
+            }
+        }
+        
+        // Reply to tweet functionality
+        function replyToTweet(tweetId) {
+            window.location.href = `/tweet/${tweetId}/reply/`;
+        }
+        
+        // Report tweet functionality
+        function reportTweet(tweetId) {
+            // This would require additional implementation
+            alert('Report functionality coming soon!');
+        }
+        
+        // Image modal functionality
+        function openImageModal(imageUrl) {
+            // Create modal if it doesn't exist
+            let modal = document.getElementById('imageModal');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'imageModal';
+                modal.className = 'modal fade';
+                modal.innerHTML = `
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <img id="modalImage" src="" class="img-fluid" alt="Image">
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            }
+            
+            document.getElementById('modalImage').src = imageUrl;
+            new bootstrap.Modal(modal).show();
+        }
+        
+        // Update notification count
+        function updateNotificationCount() {
+            fetch('/api/notifications/count/')
+            .then(response => response.json())
+            .then(data => {
+                const badge = document.querySelector('.notification-badge');
+                if (badge) {
+                    if (data.count > 0) {
+                        badge.textContent = data.count;
+                        badge.style.display = 'inline';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                }
+            });
+        }
+        
+        // Auto-update notification count every 30 seconds
+        setInterval(updateNotificationCount, 30000);
+        
+        // Auto-scroll to top functionality
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+        
+        // Show scroll to top button when scrolled down
+        window.addEventListener('scroll', function() {
+            const scrollBtn = document.getElementById('scrollToTopBtn');
+            if (scrollBtn) {
+                if (window.pageYOffset > 300) {
+                    scrollBtn.style.display = 'block';
+                } else {
+                    scrollBtn.style.display = 'none';
+                }
+            }
+        });
+    </script>
+
+    <!-- Scroll to top button -->
+    <button id="scrollToTopBtn" onclick="scrollToTop()" class="btn btn-primary position-fixed" 
+            style="bottom: 20px; right: 20px; display: none; z-index: 1000; border-radius: 50%; width: 50px; height: 50px;">
+        <i class="bi bi-arrow-up"></i>
+    </button>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architecture - Twick Documentation</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>🏗️ System Architecture</h1>
+            <p>Deep dive into Twick's architecture and design patterns</p>
+        </div>
+    </header>
+
+    <nav class="nav">
+        <div class="nav-container">
+            <ul>
+                <li><a href="../home.html">Overview</a></li>
+                <li><a href="system-architecture.html" class="active">Architecture</a></li>
+                <li><a href="containerization.html">Containerization</a></li>
+                <li><a href="api-reference.html">API Reference</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="content-grid">
+            <aside class="sidebar">
+                <h3>Architecture Topics</h3>
+                <ul>
+                    <li><a href="#overview">System Overview</a></li>
+                    <li><a href="#models">Database Models</a></li>
+                    <li><a href="#views">Views & Logic</a></li>
+                    <li><a href="#templates">Template System</a></li>
+                    <li><a href="#static-files">Static Files</a></li>
+                    <li><a href="#security">Security Features</a></li>
+                    <li><a href="#performance">Performance</a></li>
+                    <li><a href="#file-structure">File Structure</a></li>
+                </ul>
+            </aside>
+
+            <main class="main-content">
+                <section id="overview">
+                    <h1>🏗️ System Architecture</h1>
+                    
+                    <div class="alert alert-info">
+                        <strong>Architecture Overview:</strong> Twick follows Django's MVT (Model-View-Template) pattern with additional layers for enhanced functionality and maintainability.
+                    </div>
+
+                    <h2>High-Level Architecture</h2>
+                    
+                    <pre><code class="language-text">┌─────────────────────────────────────────────────────────────┐
+│                        Frontend Layer                           │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐ │
+│  │   Bootstrap 5   │  │   JavaScript    │  │  Custom CSS     │ │
+│  │   (UI Framework)│  │   (Interactions)│  │  (Styling)      │ │
+│  └─────────────────┘  └─────────────────┘  └─────────────────┘ │
+└─────────────────────────────────────────────────────────────────┘
+                                │
+┌─────────────────────────────────────────────────────────────────┐
+│                      Django Application Layer                   │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐ │
+│  │     Views       │  │    Templates    │  │      Forms      │ │
+│  │  (Logic Layer)  │  │  (Presentation) │  │  (Validation)   │ │
+│  └─────────────────┘  └─────────────────┘  └─────────────────┘ │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐ │
+│  │     Models      │  │    Middleware   │  │   Templatetags  │ │
+│  │ (Data Layer)    │  │  (Processing)   │  │   (Helpers)     │ │
+│  └─────────────────┘  └─────────────────┘  └─────────────────┘ │
+└─────────────────────────────────────────────────────────────────┘
+                                │
+┌─────────────────────────────────────────────────────────────────┐
+│                        Data Layer                               │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐ │
+│  │     SQLite      │  │   File System   │  │      Cache      │ │
+│  │   (Database)    │  │ (Media/Static)  │  │   (Optional)    │ │
+│  └─────────────────┘  └─────────────────┘  └─────────────────┘ │
+└─────────────────────────────────────────────────────────────────┘</code></pre>
+                </section>
+
+                <section id="models">
+                    <h2 id="models">📊 Database Models</h2>
+                    
+                    <p>Twick's data model is designed for scalability and extensibility. Here's a detailed breakdown of the key models:</p>
+
+                    <h3>Tweet Model</h3>
+                    <div class="card">
+                        <pre><code class="language-python">class Tweet(models.Model):
+    PRIVACY_CHOICES = [
+        ('public', 'Public'),
+        ('private', 'Private'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    text = models.TextField(max_length=280)
+    image = models.ImageField(upload_to='photos/', blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    likes = models.ManyToManyField(User, related_name='liked_tweets', blank=True)
+    privacy = models.CharField(max_length=10, choices=PRIVACY_CHOICES, default='public')
+    parent_tweet = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+    
+    class Meta:
+        ordering = ['-created_at']</code></pre>
+                        
+                        <h4>Key Features:</h4>
+                        <ul>
+                            <li><strong>Thread Support:</strong> Self-referencing foreign key for replies</li>
+                            <li><strong>Privacy Controls:</strong> Public/private tweet visibility</li>
+                            <li><strong>Media Support:</strong> Image upload with Pillow processing</li>
+                            <li><strong>Social Features:</strong> Many-to-many relationship for likes</li>
+                        </ul>
+                    </div>
+
+                    <h3>User Profile Model</h3>
+                    <div class="card">
+                        <pre><code class="language-python">class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    bio = models.TextField(max_length=500, blank=True)
+    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
+    cover_image = models.ImageField(upload_to='covers/', blank=True, null=True)
+    location = models.CharField(max_length=100, blank=True)
+    website = models.URLField(blank=True)
+    birth_date = models.DateField(blank=True, null=True)
+    is_private = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)</code></pre>
+                        
+                        <h4>Profile Features:</h4>
+                        <ul>
+                            <li><strong>Extended User Data:</strong> Bio, location, website, birth date</li>
+                            <li><strong>Visual Identity:</strong> Avatar and cover image support</li>
+                            <li><strong>Privacy Settings:</strong> Private account functionality</li>
+                        </ul>
+                    </div>
+
+                    <h3>Follow Relationship Model</h3>
+                    <div class="card">
+                        <pre><code class="language-python">class Follow(models.Model):
+    follower = models.ForeignKey(User, related_name='following', on_delete=models.CASCADE)
+    following = models.ForeignKey(User, related_name='followers', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_accepted = models.BooleanField(default=True)
+    
+    class Meta:
+        unique_together = ('follower', 'following')</code></pre>
+                        
+                        <h4>Social Graph Features:</h4>
+                        <ul>
+                            <li><strong>Follow Requests:</strong> Support for private account approvals</li>
+                            <li><strong>Bidirectional Relationships:</strong> Efficient follower/following queries</li>
+                            <li><strong>Unique Constraints:</strong> Prevents duplicate follow relationships</li>
+                        </ul>
+                    </div>
+
+                    <h3>Notification System</h3>
+                    <div class="card">
+                        <pre><code class="language-python">class Notification(models.Model):
+    NOTIFICATION_TYPES = [
+        ('like', 'Like'),
+        ('follow', 'Follow'),
+        ('reply', 'Reply'),
+        ('mention', 'Mention'),
+        ('message', 'Message'),
+    ]
+    
+    recipient = models.ForeignKey(User, related_name='notifications', on_delete=models.CASCADE)
+    sender = models.ForeignKey(User, related_name='sent_notifications', on_delete=models.CASCADE)
+    notification_type = models.CharField(max_length=20, choices=NOTIFICATION_TYPES)
+    content_object = models.ForeignKey('contenttypes.ContentType', on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content = models.GenericForeignKey('content_type', 'object_id')
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)</code></pre>
+                        
+                        <h4>Notification Features:</h4>
+                        <ul>
+                            <li><strong>Generic Relations:</strong> Link to any model type</li>
+                            <li><strong>Type-based Filtering:</strong> Different notification categories</li>
+                            <li><strong>Read Status:</strong> Track user engagement</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section id="views">
+                    <h2>🎯 Views & Business Logic</h2>
+                    
+                    <p>Twick uses a combination of function-based and class-based views, organized by functionality:</p>
+
+                    <h3>View Organization</h3>
+                    <div class="card">
+                        <h4>Main View Categories:</h4>
+                        <ul>
+                            <li><strong>Authentication Views:</strong> Login, register, logout</li>
+                            <li><strong>Tweet Views:</strong> CRUD operations, feed generation</li>
+                            <li><strong>Social Views:</strong> Follow/unfollow, user profiles</li>
+                            <li><strong>Search Views:</strong> Content discovery and filtering</li>
+                            <li><strong>API Views:</strong> AJAX endpoints for dynamic interactions</li>
+                        </ul>
+                    </div>
+
+                    <h3>Example: Tweet Creation View</h3>
+                    <div class="card">
+                        <pre><code class="language-python">def tweet_create(request):
+    if request.method == 'POST':
+        form = TweetForm(request.POST, request.FILES)
+        if form.is_valid():
+            tweet = form.save(commit=False)
+            tweet.user = request.user
+            tweet.save()
+            
+            # Extract and create hashtags
+            hashtags = extract_hashtags(tweet.text)
+            for hashtag_text in hashtags:
+                hashtag, created = Hashtag.objects.get_or_create(
+                    name=hashtag_text.lower()
+                )
+                tweet.hashtags.add(hashtag)
+            
+            # Create notifications for mentions
+            mentions = extract_mentions(tweet.text)
+            for username in mentions:
+                try:
+                    mentioned_user = User.objects.get(username=username)
+                    Notification.objects.create(
+                        recipient=mentioned_user,
+                        sender=request.user,
+                        notification_type='mention',
+                        content_object=tweet,
+                        message=f'{request.user.username} mentioned you in a tweet'
+                    )
+                except User.DoesNotExist:
+                    pass
+            
+            messages.success(request, 'Tweet posted successfully!')
+            return redirect('home')
+    else:
+        form = TweetForm()
+    
+    return render(request, 'tweet_form.html', {'form': form})</code></pre>
+                        
+                        <h4>Business Logic Features:</h4>
+                        <ul>
+                            <li><strong>Hashtag Processing:</strong> Automatic extraction and linking</li>
+                            <li><strong>Mention System:</strong> User notification on mentions</li>
+                            <li><strong>Form Validation:</strong> Server-side data validation</li>
+                            <li><strong>User Feedback:</strong> Success/error messaging</li>
+                        </ul>
+                    </div>
+
+                    <h3>Personalized Feed Algorithm</h3>
+                    <div class="card">
+                        <pre><code class="language-python">def personalized_feed(request):
+    if not request.user.is_authenticated:
+        return redirect('home')
+    
+    # Get users that the current user follows
+    following_users = request.user.following.filter(
+        is_accepted=True
+    ).values_list('following', flat=True)
+    
+    # Get tweets from followed users and user's own tweets
+    feed_tweets = Tweet.objects.filter(
+        Q(user__in=following_users) | Q(user=request.user),
+        privacy='public'
+    ).select_related('user').prefetch_related(
+        'likes', 'hashtags', 'replies'
+    ).order_by('-created_at')
+    
+    # Apply pagination
+    paginator = Paginator(feed_tweets, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    return render(request, 'personalized_feed.html', {
+        'page_obj': page_obj,
+        'tweets': page_obj.object_list
+    })</code></pre>
+                        
+                        <h4>Feed Algorithm Features:</h4>
+                        <ul>
+                            <li><strong>Social Graph Integration:</strong> Show content from followed users</li>
+                            <li><strong>Database Optimization:</strong> Select/prefetch related objects</li>
+                            <li><strong>Privacy Respect:</strong> Filter private content appropriately</li>
+                            <li><strong>Performance:</strong> Pagination for large datasets</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section id="templates">
+                    <h2>🎨 Template System</h2>
+                    
+                    <p>Twick uses Django's template system with custom template tags and a component-based approach:</p>
+
+                    <h3>Template Organization</h3>
+                    <div class="card">
+                        <pre><code class="language-text">templates/
+├── layout.html              # Base template with navigation
+├── home.html               # Main feed page
+├── user_profile.html       # User profile display
+├── edit_profile.html       # Profile editing form
+├── registration/           # Authentication templates
+│   ├── login.html
+│   ├── register.html
+│   └── password_change_form.html
+├── components/             # Reusable components
+│   ├── tweet_card.html     # Individual tweet display
+│   ├── notification_badge.html
+│   └── message_badge.html
+└── tweet/                  # Tweet-specific templates
+    ├── tweet_list.html
+    ├── tweet_detail.html
+    ├── tweet_form.html
+    └── search_results.html</code></pre>
+                    </div>
+
+                    <h3>Custom Template Tags</h3>
+                    <div class="card">
+                        <p>Twick includes custom template tags for enhanced functionality:</p>
+                        
+                        <pre><code class="language-python"># templatetags/custom_filters.py
+from django import template
+from django.utils.safestring import mark_safe
+import re
+
+register = template.Library()
+
+@register.inclusion_tag('components/notification_badge.html')
+def notification_badge(user):
+    """Display notification count badge"""
+    if user.is_authenticated:
+        unread_count = user.notifications.filter(is_read=False).count()
+        return {'unread_count': unread_count}
+    return {'unread_count': 0}
+
+@register.inclusion_tag('components/message_badge.html')
+def message_badge(user):
+    """Display unread message count"""
+    if user.is_authenticated:
+        unread_messages = user.received_conversations.filter(
+            last_message__is_read=False
+        ).count()
+        return {'unread_count': unread_messages}
+    return {'unread_count': 0}
+
+@register.filter
+def linkify_hashtags(text):
+    """Convert hashtags to clickable links"""
+    hashtag_pattern = r'#(\w+)'
+    linked_text = re.sub(
+        hashtag_pattern,
+        r'<a href="/hashtag/\1/" class="hashtag-link">#\1</a>',
+        text
+    )
+    return mark_safe(linked_text)</code></pre>
+                    </div>
+                </section>
+
+                <section id="static-files">
+                    <h2>📁 Static Files Management</h2>
+                    
+                    <p>Twick efficiently manages static files (CSS, JavaScript, images) and media uploads with proper organization and optimization:</p>
+
+                    <h3>Static Files Structure</h3>
+                    <div class="card">
+                        <pre><code class="language-text">static/
+├── css/
+│   ├── custom.css           # Main application styles
+│   ├── admin-override.css   # Admin interface customizations
+│   └── themes/             # User theme options
+├── js/
+│   ├── main.js             # Core JavaScript functionality
+│   ├── ajax-handlers.js    # AJAX request handlers
+│   ├── notifications.js    # Real-time notifications
+│   └── utils.js           # Utility functions
+├── images/
+│   ├── favicon.svg         # Site favicon
+│   ├── logo/              # Brand assets
+│   ├── icons/             # UI icons
+│   └── backgrounds/       # Background images
+└── fonts/                 # Custom web fonts
+
+staticfiles/                # Collected static files (production)
+├── admin/                 # Django admin static files
+├── css/                   # Collected CSS files
+├── js/                    # Collected JavaScript files
+└── images/                # Collected images</code></pre>
+                    </div>
+
+                    <h3>Media Files Organization</h3>
+                    <div class="card">
+                        <pre><code class="language-text">media/
+├── avatars/               # User profile pictures
+│   ├── default.png       # Default avatar
+│   └── user_uploads/     # User-uploaded avatars
+├── covers/               # Profile cover photos
+├── photos/               # Tweet image attachments
+├── dm_files/            # Direct message file attachments
+│   ├── documents/       # PDF, DOC, etc.
+│   ├── archives/        # ZIP, RAR files
+│   └── other/           # Other file types
+├── dm_images/           # Direct message images
+└── dm_videos/           # Direct message videos</code></pre>
+                    </div>
+
+                    <h3>Static Files Configuration</h3>
+                    <div class="card">
+                        <pre><code class="language-python"># settings.py - Static files configuration
+import os
+
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
+# Media files (User uploads)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Static files finders
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+]
+
+# File upload settings
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024   # 10MB
+
+# Allowed file extensions for security
+ALLOWED_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp']
+ALLOWED_VIDEO_EXTENSIONS = ['.mp4', '.webm', '.ogg']
+ALLOWED_DOCUMENT_EXTENSIONS = ['.pdf', '.doc', '.docx', '.txt']</code></pre>
+                    </div>
+
+                    <h3>Template Usage</h3>
+                    <div class="card">
+                        <pre><code class="language-html">&lt;!-- Loading static files in templates --&gt;
+{% load static %}
+
+&lt;!-- CSS files --&gt;
+&lt;link rel="stylesheet" href="{% static 'css/custom.css' %}"&gt;
+
+&lt;!-- JavaScript files --&gt;
+&lt;script src="{% static 'js/main.js' %}"&gt;&lt;/script&gt;
+
+&lt;!-- Images --&gt;
+&lt;img src="{% static 'images/logo.png' %}" alt="Twick Logo"&gt;
+
+&lt;!-- User uploaded media --&gt;
+{% if user.userprofile.avatar %}
+    &lt;img src="{{ user.userprofile.avatar.url }}" alt="User Avatar"&gt;
+{% else %}
+    &lt;img src="{% static 'images/default-avatar.png' %}" alt="Default Avatar"&gt;
+{% endif %}</code></pre>
+                    </div>
+
+                    <h3>Production Optimization</h3>
+                    <div class="card">
+                        <ul>
+                            <li><strong>Static File Collection:</strong> <code>python manage.py collectstatic</code></li>
+                            <li><strong>Compression:</strong> CSS and JavaScript minification</li>
+                            <li><strong>CDN Integration:</strong> Serve static files from CDN in production</li>
+                            <li><strong>Caching:</strong> Browser and server-side caching headers</li>
+                            <li><strong>Image Optimization:</strong> Automatic image compression and resizing</li>
+                            <li><strong>Security:</strong> File type validation and virus scanning</li>
+                        </ul>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Twick Documentation. Built with ❤️ and Django.</p>
+        </div>
+    </footer>
+
+    <button class="back-to-top" aria-label="Back to top">↑</button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script src="../assets/js/script.js"></script>
+</body>
+</html>

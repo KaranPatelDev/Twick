@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twick - Django Twitter Clone Documentation</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+    <meta name="description" content="Complete documentation for Twick - A Django-based Twitter clone with real-time features, Docker support, and modern architecture.">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>🐦 Twick Documentation</h1>
+            <p>Comprehensive guide to building and deploying a Django Twitter clone</p>
+        </div>
+    </header>
+
+    <nav class="nav">
+        <div class="nav-container">
+            <ul>
+                <li><a href="#overview" class="active">Overview</a></li>
+                <li><a href="pages/architecture.html">Architecture</a></li>
+                <li><a href="pages/containerization.html">Containerization</a></li>
+                <li><a href="pages/api-reference.html">API Reference</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="content-grid">
+            <aside class="sidebar">
+                <h3>Quick Navigation</h3>
+                <ul>
+                    <li><a href="#overview">Project Overview</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#tech-stack">Tech Stack</a></li>
+                    <li><a href="#installation">Installation</a></li>
+                    <li><a href="#docker-setup">Docker Setup</a></li>
+                    <li><a href="#local-development">Local Development</a></li>
+                    <li><a href="#production">Production Setup</a></li>
+                    <li><a href="#api-usage">API Usage</a></li>
+                    <li><a href="#deployment-netlify">Deploy to Netlify</a></li>
+                </ul>
+            </aside>
+
+            <main class="main-content">
+                <section id="overview">
+                    <h1>🐦 Twick - Django Twitter Clone</h1>
+                    
+                    <div class="alert alert-info">
+                        <strong>Welcome!</strong> This documentation covers everything you need to know about Twick, a full-featured Twitter clone built with Django. From installation to deployment, we've got you covered.
+                    </div>
+
+                    <p>Twick is a modern, feature-rich social media platform inspired by Twitter, built using Django 5.1.1 and modern web technologies. This project demonstrates best practices in Django development, including real-time features, user authentication, media handling, and production-ready deployment configurations.</p>
+
+                    <h2 id="features">✨ Features</h2>
+                    
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">📝</div>
+                            <h3>Tweet Management</h3>
+                            <p>Create, edit, delete tweets with image support and character limit validation</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="feature-icon">💬</div>
+                            <h3>Real-time Messaging</h3>
+                            <p>Direct messaging system with conversation threading and real-time updates</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="feature-icon">👥</div>
+                            <h3>Social Features</h3>
+                            <p>Follow/unfollow users, like tweets, reply to conversations, and user profiles</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="feature-icon">🔔</div>
+                            <h3>Notifications</h3>
+                            <p>Real-time notifications for likes, follows, mentions, and new messages</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="feature-icon">🔍</div>
+                            <h3>Advanced Search</h3>
+                            <p>Search tweets, users, hashtags with filtering and trending topics</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="feature-icon">🏷️</div>
+                            <h3>Hashtag System</h3>
+                            <p>Automatic hashtag extraction, trending hashtags, and hashtag-based discovery</p>
+                        </div>
+                    </div>
+
+                    <h2 id="tech-stack">🛠️ Technology Stack</h2>
+                    
+                    <div class="card">
+                        <h3>Backend Technologies</h3>
+                        <ul>
+                            <li><strong>Django 5.1.1</strong> - Web framework</li>
+                            <li><strong>Python 3.12</strong> - Programming language</li>
+                            <li><strong>SQLite/PostgreSQL</strong> - Database</li>
+                            <li><strong>Pillow 10.2.0</strong> - Image processing</li>
+                            <li><strong>Gunicorn 21.2.0</strong> - WSGI server</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <h3>Frontend Technologies</h3>
+                        <ul>
+                            <li><strong>Bootstrap 5.3.2</strong> - CSS framework</li>
+                            <li><strong>Bootstrap Icons</strong> - Icon library</li>
+                            <li><strong>Vanilla JavaScript</strong> - Client-side interactions</li>
+                            <li><strong>CSS3 with Custom Properties</strong> - Styling</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <h3>DevOps & Deployment</h3>
+                        <ul>
+                            <li><strong>Docker & Docker Compose</strong> - Containerization</li>
+                            <li><strong>Nginx</strong> - Reverse proxy and static file serving</li>
+                            <li><strong>GitHub Actions</strong> - CI/CD pipeline</li>
+                            <li><strong>Environment-based Configuration</strong> - Development/Production settings</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section id="installation">
+                    <h2>🚀 Installation Guide</h2>
+                    
+                    <div class="alert alert-warning">
+                        <strong>Prerequisites:</strong> Ensure you have Python 3.12+, Git, and optionally Docker installed on your system.
+                    </div>
+
+                    <h3>Method 1: Local Development Setup</h3>
+                    
+                    <p>Follow these steps to set up Twick for local development:</p>
+
+                    <h4>1. Clone the Repository</h4>
+                    <pre><code class="language-bash">git clone https://github.com/yourusername/twick.git
+cd twick</code></pre>
+
+                    <h4>2. Create Virtual Environment</h4>
+                    <pre><code class="language-bash"># Windows
+python -m venv venv
+venv\Scripts\activate
+
+# macOS/Linux
+python3 -m venv venv
+source venv/bin/activate</code></pre>
+
+                    <h4>3. Install Dependencies</h4>
+                    <pre><code class="language-bash">pip install -r requirements.txt</code></pre>
+
+                    <h4>4. Database Setup</h4>
+                    <pre><code class="language-bash">python manage.py makemigrations
+python manage.py migrate</code></pre>
+
+                    <h4>5. Create Superuser</h4>
+                    <pre><code class="language-bash">python manage.py createsuperuser</code></pre>
+
+                    <h4>6. Run Development Server</h4>
+                    <pre><code class="language-bash">python manage.py runserver</code></pre>
+
+                    <p>Visit <code>http://127.0.0.1:8000</code> to access your local Twick instance!</p>
+                </section>
+
+                <section id="docker-setup">
+                    <h2>🐳 Docker Setup</h2>
+                    
+                    <p>Twick includes comprehensive Docker support for both development and production environments.</p>
+
+                    <h3>Development with Docker</h3>
+                    <pre><code class="language-bash"># Build and run with docker-compose
+docker-compose up --build
+
+# Run in detached mode
+docker-compose up -d
+
+# View logs
+docker-compose logs -f</code></pre>
+
+                    <h3>Production with Docker</h3>
+                    <pre><code class="language-bash"># Use production configuration
+docker-compose -f docker-compose.prod.yml up --build -d
+
+# Or use the provided script
+./start_prod.sh</code></pre>
+
+                    <h3>Docker Configuration Details</h3>
+                    
+                    <div class="card">
+                        <h4>Dockerfile Features</h4>
+                        <ul>
+                            <li>Multi-stage build optimization</li>
+                            <li>Security hardening with non-root user</li>
+                            <li>Optimized layer caching</li>
+                            <li>Health checks and monitoring</li>
+                            <li>Environment-specific configurations</li>
+                        </ul>
+                    </div>
+
+                    <h4>Key Docker Files:</h4>
+                    <ul>
+                        <li><code>Dockerfile</code> - Development container</li>
+                        <li><code>Dockerfile.prod</code> - Production-optimized container</li>
+                        <li><code>docker-compose.yml</code> - Development services</li>
+                        <li><code>docker-compose.prod.yml</code> - Production services with Nginx</li>
+                    </ul>
+                </section>
+
+                <section id="local-development">
+                    <h2>💻 Local Development</h2>
+                    
+                    <h3>Development Workflow</h3>
+                    <p>Here's the recommended workflow for developing Twick:</p>
+
+                    <ol>
+                        <li><strong>Environment Setup:</strong> Use the virtual environment for dependency isolation</li>
+                        <li><strong>Database Management:</strong> Run migrations after model changes</li>
+                        <li><strong>Static Files:</strong> Collect static files for production testing</li>
+                        <li><strong>Testing:</strong> Run tests before committing changes</li>
+                    </ol>
+
+                    <h3>Useful Commands</h3>
+                    <pre><code class="language-bash"># Collect static files
+python manage.py collectstatic
+
+# Run tests
+python manage.py test
+
+# Check for issues
+python manage.py check
+
+# Create migrations
+python manage.py makemigrations
+
+# Apply migrations
+python manage.py migrate
+
+# Load sample data (if fixtures exist)
+python manage.py loaddata fixtures/sample_data.json</code></pre>
+
+                    <h3>Environment Variables</h3>
+                    <p>Create a <code>.env</code> file in the project root:</p>
+                    <pre><code class="language-bash">DEBUG=True
+SECRET_KEY=your-secret-key-here
+DATABASE_URL=sqlite:///db.sqlite3
+ALLOWED_HOSTS=127.0.0.1,localhost</code></pre>
+                </section>
+
+                <section id="production">
+                    <h2>🏭 Production Setup</h2>
+                    
+                    <div class="alert alert-danger">
+                        <strong>Security Notice:</strong> Never use the default secret key in production. Always set DEBUG=False and configure proper ALLOWED_HOSTS.
+                    </div>
+
+                    <h3>Production Checklist</h3>
+                    <ul>
+                        <li>✅ Set <code>DEBUG=False</code></li>
+                        <li>✅ Configure proper <code>SECRET_KEY</code></li>
+                        <li>✅ Set up production database (PostgreSQL recommended)</li>
+                        <li>✅ Configure <code>ALLOWED_HOSTS</code></li>
+                        <li>✅ Set up static file serving</li>
+                        <li>✅ Configure media file handling</li>
+                        <li>✅ Set up SSL/HTTPS</li>
+                        <li>✅ Configure logging</li>
+                        <li>✅ Set up monitoring</li>
+                    </ul>
+
+                    <h3>Production Environment Variables</h3>
+                    <pre><code class="language-bash">DEBUG=False
+SECRET_KEY=your-production-secret-key
+DATABASE_URL=postgresql://user:password@localhost:5432/twick_db
+ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com
+STATIC_ROOT=/var/www/static/
+MEDIA_ROOT=/var/www/media/</code></pre>
+
+                    <h3>Nginx Configuration</h3>
+                    <p>Sample Nginx configuration for production:</p>
+                    <pre><code class="language-nginx">server {
+    listen 80;
+    server_name yourdomain.com www.yourdomain.com;
+    
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    
+    location /static/ {
+        alias /var/www/static/;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+    
+    location /media/ {
+        alias /var/www/media/;
+        expires 1y;
+        add_header Cache-Control "public";
+    }
+}</code></pre>
+                </section>
+
+                <section id="api-usage">
+                    <h2>🔌 API Usage Examples</h2>
+                    
+                    <p>Twick provides a RESTful API for programmatic access to core features:</p>
+
+                    <h3>Authentication</h3>
+                    <pre><code class="language-javascript">// Login example
+fetch('/api/auth/login/', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken
+    },
+    body: JSON.stringify({
+        username: 'your_username',
+        password: 'your_password'
+    })
+})</code></pre>
+
+                    <h3>Creating a Tweet</h3>
+                    <pre><code class="language-javascript">// Create tweet
+fetch('/api/tweets/', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken,
+        'Authorization': 'Bearer ' + token
+    },
+    body: JSON.stringify({
+        text: 'Hello, Twick world! 🐦',
+        privacy: 'public'
+    })
+})</code></pre>
+
+                    <h3>Following a User</h3>
+                    <pre><code class="language-javascript">// Follow user
+fetch(`/api/follow/username/`, {
+    method: 'POST',
+    headers: {
+        'X-CSRFToken': csrfToken,
+        'X-Requested-With': 'XMLHttpRequest'
+    }
+})</code></pre>
+
+                    <div class="alert alert-info">
+                        <strong>API Documentation:</strong> For complete API reference, visit the <a href="pages/api-reference.html">API Reference</a> page.
+                    </div>
+                </section>
+
+                <section id="deployment-netlify">
+                    <h2>🌐 Deploy Documentation to Netlify</h2>
+                    
+                    <p>This documentation site is ready for deployment on Netlify. Follow these steps:</p>
+
+                    <h3>Method 1: Git-based Deployment</h3>
+                    <ol>
+                        <li>Push your project to GitHub/GitLab</li>
+                        <li>Connect your repository to Netlify</li>
+                        <li>Set build command: <code>echo "Static site, no build needed"</code></li>
+                        <li>Set publish directory: <code>documentation_site</code></li>
+                        <li>Deploy!</li>
+                    </ol>
+
+                    <h3>Method 2: Manual Deployment</h3>
+                    <ol>
+                        <li>Zip the <code>documentation_site</code> folder</li>
+                        <li>Go to <a href="https://netlify.com" target="_blank">Netlify</a></li>
+                        <li>Drag and drop your zip file</li>
+                        <li>Your documentation is live!</li>
+                    </ol>
+
+                    <h3>Netlify Configuration</h3>
+                    <p>Create a <code>netlify.toml</code> file in the documentation_site folder:</p>
+                    <pre><code class="language-toml">[build]
+  publish = "."
+  
+[[redirects]]
+  from = "/api/*"
+  to = "/pages/api-reference.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"</code></pre>
+
+                    <div class="alert alert-success">
+                        <strong>Ready to Deploy!</strong> Your documentation site is optimized for static hosting and will work perfectly on Netlify, GitHub Pages, or any static hosting service.
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Twick Documentation. Built with ❤️ and Django.</p>
+        </div>
+    </footer>
+
+    <button class="back-to-top" aria-label="Back to top">↑</button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script src="assets/js/script.js"></script>
+</body>
+</html>
